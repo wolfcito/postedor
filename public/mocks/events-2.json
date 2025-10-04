@@ -1,0 +1,24 @@
+[
+  {
+    "id": "e6",
+    "tokenId": "2",
+    "type": "READING",
+    "actor": "operador:0xjkl012",
+    "attestationUID": "0xuidr3a2b3c4d5e6f7",
+    "txHash": "0xtx6a2b3c4d5e6f7890",
+    "ts": "2025-09-21T08:15:00Z",
+    "deliveredKWh": 18200,
+    "remainingKWh": 5800
+  },
+  {
+    "id": "e7",
+    "tokenId": "2",
+    "type": "MAINTENANCE",
+    "actor": "operador:0xmno345",
+    "attestationUID": "0xuidm3a2b3c4d5e6f7",
+    "txHash": "0xtx7a2b3c4d5e6f7890",
+    "ts": "2025-09-15T16:45:00Z",
+    "maintenanceKind": 0,
+    "notes": "Inspección preventiva trimestral"
+  }
+]

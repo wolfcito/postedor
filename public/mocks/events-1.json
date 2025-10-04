@@ -1,0 +1,57 @@
+[
+  {
+    "id": "e1",
+    "tokenId": "1",
+    "type": "READING",
+    "actor": "operador:0xabc123",
+    "attestationUID": "0xuidr1a2b3c4d5e6f7",
+    "txHash": "0xtx1a2b3c4d5e6f7890",
+    "ts": "2025-09-20T12:45:00Z",
+    "deliveredKWh": 12500,
+    "remainingKWh": 3500
+  },
+  {
+    "id": "e2",
+    "tokenId": "1",
+    "type": "MAINTENANCE",
+    "actor": "operador:0xabc123",
+    "attestationUID": "0xuidm1a2b3c4d5e6f7",
+    "txHash": "0xtx2a2b3c4d5e6f7890",
+    "ts": "2025-09-18T10:00:00Z",
+    "maintenanceKind": 1,
+    "notes": "Cambio de fusible por sobrecarga"
+  },
+  {
+    "id": "e3",
+    "tokenId": "1",
+    "type": "REPLACEMENT",
+    "actor": "operador:0xdef456",
+    "attestationUID": "0xuidx1a2b3c4d5e6f7",
+    "txHash": "0xtx3a2b3c4d5e6f7890",
+    "ts": "2025-09-10T09:15:00Z",
+    "oldSerial": "SN-00123",
+    "newSerial": "SN-00456"
+  },
+  {
+    "id": "e4",
+    "tokenId": "1",
+    "type": "MAINTENANCE",
+    "actor": "operador:0xghi789",
+    "attestationUID": "0xuidm2a2b3c4d5e6f7",
+    "txHash": "0xtx4a2b3c4d5e6f7890",
+    "ts": "2025-09-05T14:30:00Z",
+    "maintenanceKind": 2,
+    "notes": "Repintado de identificación"
+  },
+  {
+    "id": "e5",
+    "tokenId": "1",
+    "type": "READING",
+    "actor": "operador:0xabc123",
+    "attestationUID": "0xuidr2a2b3c4d5e6f7",
+    "txHash": "0xtx5a2b3c4d5e6f7890",
+    "ts": "2025-08-28T11:20:00Z",
+    "deliveredKWh": 11800,
+    "remainingKWh": 4200
+  }
+]
