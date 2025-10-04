@@ -1,4 +1,5 @@
 import type { Poste, PosteEvent } from "./types"
+import { hashAssetTag } from "./hash-utils"
 
 function getBaseUrl() {
   const envUrl =
@@ -33,8 +34,8 @@ export async function getPosteByTokenId(tokenId: string): Promise<Poste> {
 }
 
 export async function resolveAssetTag(assetTag: string): Promise<{ tokenId: string }> {
-  const mockHash = `0x${assetTag.split("").reduce((acc, char) => acc + char.charCodeAt(0).toString(16), "")}`
-  console.log("[v0:mock] Asset tag hashed", { assetTag, hash: mockHash })
+  const hash = hashAssetTag(assetTag)
+  console.log("[v0:mock] Asset tag hashed", { assetTag, hash })
 
   const data = await getPostesData()
   const poste = data.find((d) => d.assetTag === assetTag)
