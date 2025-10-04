@@ -6,6 +6,8 @@ import { StatCard } from "@/components/stat-card"
 import { TimelineWithRefresh } from "@/components/timeline-with-refresh"
 import { Zap, TrendingUp, TrendingDown, Shield } from "lucide-react"
 import { Card } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
+import Link from "next/link"
 
 export const revalidate = 60
 
@@ -65,6 +67,12 @@ async function PosteContent({ tokenId }: { tokenId: string }) {
                 icon={Shield}
                 trend={poste.seguridad >= 5 ? "up" : poste.seguridad >= 0 ? "neutral" : "down"}
               />
+            </div>
+
+            <div className="flex justify-end">
+              <Button asChild size="lg">
+                <Link href={`/ops/${tokenId}/new`}>Registrar Nueva Intervención</Link>
+              </Button>
             </div>
 
             {/* Timeline */}
