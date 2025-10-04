@@ -7,6 +7,8 @@ import { EventsTimeline } from "@/components/events-timeline"
 import { Zap, TrendingUp, TrendingDown, Shield } from "lucide-react"
 import { Card } from "@/components/ui/card"
 
+export const dynamic = "force-dynamic"
+
 interface PageProps {
   params: Promise<{ tokenId: string }>
 }
@@ -92,10 +94,6 @@ function LoadingSkeleton() {
       </div>
     </div>
   )
-}
-
-export async function generateStaticParams() {
-  return [{ tokenId: "1" }, { tokenId: "2" }]
 }
 
 export default async function PostePage({ params }: PageProps) {

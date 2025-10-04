@@ -1,12 +1,10 @@
 import { redirect } from "next/navigation"
 import { resolveAssetTag } from "@/lib/mock-service"
 
+export const dynamic = "force-dynamic"
+
 interface PageProps {
   params: Promise<{ assetTag: string }>
-}
-
-export async function generateStaticParams() {
-  return [{ assetTag: "POSTE-001" }, { assetTag: "POSTE-002" }]
 }
 
 export default async function AssetTagPage({ params }: PageProps) {
