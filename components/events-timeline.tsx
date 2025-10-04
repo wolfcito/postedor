@@ -1,7 +1,7 @@
 import type { PosteEvent } from "@/lib/types"
 import { Card } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Wrench, Zap, PaintBucket, Shield, RefreshCw, Activity } from "lucide-react"
+import { Wrench, Zap, PaintBucket, Shield, RefreshCw, Activity, TrendingUp, TrendingDown } from "lucide-react"
 import { AttestationBadge } from "./attestation-badge"
 import { TxLink } from "./tx-link"
 
@@ -54,6 +54,19 @@ export function EventsTimeline({ events }: EventsTimelineProps) {
     return "bg-primary/10 text-primary border-primary/20"
   }
 
+  const calculateReadingDelta = (currentEvent: PosteEvent, index: number): number | null => {
+    if (currentEvent.type !== "READING") return null
+
+    // Find the next reading event (events are sorted newest first)
+    for (let i = index + 1; i < events.length; i++) {
+      if (events[i].type === "READING") {
+        const previousReading = events[i]
+        return currentEvent.deliveredKWh - previousReading.deliveredKWh
+      }
+    }
+    return null // No previous reading found
+  }
+
   const formatDate = (isoString: string) => {
     const date = new Date(isoString)
     return {
@@ -69,6 +82,8 @@ export function EventsTimeline({ events }: EventsTimelineProps) {
     }
   }
 
+  console.log("[v0] Rendering timeline with", events.length, "events")
+
   if (events.length === 0) {
     return (
       <Card className="p-12 text-center">
@@ -82,6 +97,7 @@ export function EventsTimeline({ events }: EventsTimelineProps) {
     <div className="space-y-4">
       {events.map((event, index) => {
         const { date, time } = formatDate(event.ts)
+        const readingDelta = calculateReadingDelta(event, index)
 
         return (
           <Card key={event.id} className="p-6 hover:shadow-lg transition-shadow">
@@ -142,15 +158,33 @@ export function EventsTimeline({ events }: EventsTimelineProps) {
                 )}
 
                 {event.type === "READING" && (
-                  <div className="grid grid-cols-2 gap-3">
-                    <div className="bg-muted/50 p-3 rounded-lg">
-                      <p className="text-xs text-muted-foreground mb-1">Entregado</p>
-                      <p className="text-lg font-semibold">{event.deliveredKWh.toLocaleString("es-CO")} kWh</p>
+                  <div className="space-y-3">
+                    <div className="grid grid-cols-2 gap-3">
+                      <div className="bg-muted/50 p-3 rounded-lg">
+                        <p className="text-xs text-muted-foreground mb-1">Entregado</p>
+                        <p className="text-lg font-semibold">{event.deliveredKWh.toLocaleString("es-CO")} kWh</p>
+                      </div>
+                      <div className="bg-muted/50 p-3 rounded-lg">
+                        <p className="text-xs text-muted-foreground mb-1">Restante</p>
+                        <p className="text-lg font-semibold">{event.remainingKWh.toLocaleString("es-CO")} kWh</p>
+                      </div>
                     </div>
-                    <div className="bg-muted/50 p-3 rounded-lg">
-                      <p className="text-xs text-muted-foreground mb-1">Restante</p>
-                      <p className="text-lg font-semibold">{event.remainingKWh.toLocaleString("es-CO")} kWh</p>
-                    </div>
+                    {readingDelta !== null && (
+                      <div className="bg-info/5 border border-info/20 p-3 rounded-lg flex items-center gap-2">
+                        {readingDelta > 0 ? (
+                          <TrendingUp className="w-4 h-4 text-info" />
+                        ) : (
+                          <TrendingDown className="w-4 h-4 text-muted-foreground" />
+                        )}
+                        <span className="text-sm">
+                          <span className="text-muted-foreground">Δ desde lectura anterior:</span>{" "}
+                          <span className="font-semibold text-info">
+                            {readingDelta > 0 ? "+" : ""}
+                            {readingDelta.toLocaleString("es-CO")} kWh
+                          </span>
+                        </span>
+                      </div>
+                    )}
                   </div>
                 )}
 

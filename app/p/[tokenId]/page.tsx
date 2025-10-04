@@ -3,7 +3,7 @@ import { notFound } from "next/navigation"
 import { getPosteByTokenId, getEventsByTokenId } from "@/lib/mock-service"
 import { PosteHeader } from "@/components/poste-header"
 import { StatCard } from "@/components/stat-card"
-import { EventsTimeline } from "@/components/events-timeline"
+import { TimelineWithRefresh } from "@/components/timeline-with-refresh"
 import { Zap, TrendingUp, TrendingDown, Shield } from "lucide-react"
 import { Card } from "@/components/ui/card"
 
@@ -26,6 +26,7 @@ async function PosteContent({ tokenId }: { tokenId: string }) {
 
     const fetchDuration = Date.now() - fetchStart
     console.log("[v0] Data fetched in", fetchDuration, "ms")
+    console.log("[v0] Timeline loaded with", events.length, "events")
 
     return (
       <div className="min-h-screen bg-background">
@@ -74,7 +75,7 @@ async function PosteContent({ tokenId }: { tokenId: string }) {
                   {events.length} {events.length === 1 ? "evento" : "eventos"}
                 </p>
               </div>
-              <EventsTimeline events={events} />
+              <TimelineWithRefresh initialEvents={events} tokenId={tokenId} />
             </div>
           </div>
         </div>

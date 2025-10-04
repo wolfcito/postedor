@@ -1,10 +1,28 @@
+"use client"
+
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { QrCode, Zap, Activity, Shield } from "lucide-react"
 import Link from "next/link"
 import Image from "next/image"
+import { useEffect } from "react"
+import { useSearchParams } from "next/navigation"
+import { useToast } from "@/hooks/use-toast"
 
 export default function HomePage() {
+  const searchParams = useSearchParams()
+  const { toast } = useToast()
+
+  useEffect(() => {
+    if (searchParams.get("error") === "not-found") {
+      toast({
+        title: "Poste no encontrado",
+        description: "El asset tag ingresado no corresponde a ningún poste registrado.",
+        variant: "destructive",
+      })
+    }
+  }, [searchParams, toast])
+
   return (
     <div className="min-h-screen bg-background">
       <div className="container mx-auto px-4 py-12 max-w-5xl">
@@ -30,13 +48,7 @@ export default function HomePage() {
               <p className="text-muted-foreground">Escanea el código QR en el poste para ver su información completa</p>
             </div>
             <div className="bg-muted/50 p-6 rounded-xl mb-4">
-              <Image
-                src="/qr-code.png"
-                alt="QR Code de ejemplo"
-                width={200}
-                height={200}
-                className="mx-auto"
-              />
+              <Image src="/qr-code.png" alt="QR Code de ejemplo" width={200} height={200} className="mx-auto" />
               <p className="text-xs text-muted-foreground mt-3">QR de ejemplo - Poste #1</p>
             </div>
             <Button asChild className="w-full">

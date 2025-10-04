@@ -33,6 +33,9 @@ export async function getPosteByTokenId(tokenId: string): Promise<Poste> {
 }
 
 export async function resolveAssetTag(assetTag: string): Promise<{ tokenId: string }> {
+  const mockHash = `0x${assetTag.split("").reduce((acc, char) => acc + char.charCodeAt(0).toString(16), "")}`
+  console.log("[v0:mock] Asset tag hashed", { assetTag, hash: mockHash })
+
   const data = await getPostesData()
   const poste = data.find((d) => d.assetTag === assetTag)
   if (!poste) throw new Error("AssetTag no encontrado")
