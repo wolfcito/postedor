@@ -94,6 +94,10 @@ function LoadingSkeleton() {
   )
 }
 
+export async function generateStaticParams() {
+  return [{ tokenId: "1" }, { tokenId: "2" }]
+}
+
 export default async function PostePage({ params }: PageProps) {
   const { tokenId } = await params
 
