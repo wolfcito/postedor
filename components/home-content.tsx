@@ -9,6 +9,9 @@ import Link from "next/link"
 import { useEffect, useState } from "react"
 import { useSearchParams, useRouter } from "next/navigation"
 import { useToast } from "@/hooks/use-toast"
+import { DemoSection } from "./demo-section"
+import { SearchSection } from "./search-section"
+import { FeaturesSection } from "./feature-sections"
 
 export function HomeContent() {
   const searchParams = useSearchParams()
@@ -119,77 +122,8 @@ export function HomeContent() {
         </div>
 
         <div id="buscar" className="mb-24">
-          <Card className="p-8 md:p-12 bg-zinc-900/50 border-zinc-800 backdrop-blur-sm">
-            <div className="max-w-2xl mx-auto">
-              <div className="flex items-center justify-center gap-2 mb-4">
-                <Search className="w-6 h-6 text-zinc-400" />
-                <h2 className="text-2xl font-bold text-white">Buscar por Asset Tag</h2>
-              </div>
-              <p className="text-zinc-400 text-center mb-8">
-                Ingresa el identificador del poste para ver su información completa y historial verificado
-              </p>
-              <form onSubmit={handleAssetTagSubmit} className="flex gap-3">
-                <Input
-                  type="text"
-                  placeholder="Ej: POSTE-MDE-000134"
-                  value={assetTag}
-                  onChange={(e) => setAssetTag(e.target.value)}
-                  disabled={isResolving}
-                  className="text-lg h-14 bg-zinc-800 border-zinc-700 text-white placeholder:text-zinc-500"
-                  aria-label="Asset tag del poste"
-                />
-                <Button
-                  type="submit"
-                  size="lg"
-                  disabled={isResolving || !assetTag.trim()}
-                  className="px-8 h-14 bg-white text-black hover:bg-zinc-200 font-semibold"
-                >
-                  {isResolving ? (
-                    <>
-                      <span className="animate-spin mr-2">⏳</span>
-                      Buscando...
-                    </>
-                  ) : (
-                    <>
-                      <Search className="w-5 h-5 mr-2" aria-hidden="true" />
-                      Buscar
-                    </>
-                  )}
-                </Button>
-              </form>
-            </div>
-          </Card>
-
-          <Card className="p-12 md:p-16 bg-gradient-to-br from-zinc-900 to-black border-zinc-800 backdrop-blur-sm mb-24">
-          <div className="max-w-3xl mx-auto text-center">
-            <h2 className="text-4xl font-bold mb-6 text-white">Prueba el sistema ahora</h2>
-            <p className="text-xl text-zinc-400 mb-10 text-balance">
-              Explora un poste de demostración para ver cómo funciona el sistema de seguimiento verificado on-chain
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button
-                asChild
-                size="lg"
-                className="text-lg px-10 h-14 bg-white text-black hover:bg-zinc-200 font-semibold rounded-full"
-                onClick={() => handleDemoCTAClick("1")}
-              >
-                <Link href="/p/1">
-                  Demo #1
-                  <ArrowRight className="w-5 h-5 ml-2" aria-hidden="true" />
-                </Link>
-              </Button>
-              <Button
-                asChild
-                variant="outline"
-                size="lg"
-                className="text-lg px-10 h-14 border-zinc-700 bg-transparent hover:bg-zinc-800 text-white rounded-full"
-                onClick={() => handleDemoCTAClick("2")}
-              >
-                <Link href="/p/2">Demo #2</Link>
-              </Button>
-            </div>
-          </div>
-        </Card>
+          <SearchSection />
+          <DemoSection />
         </div>
 
         <section className="mb-24" aria-labelledby="how-it-works-heading">
@@ -202,134 +136,7 @@ export function HomeContent() {
             </h2>
           </div>
 
-          <div className="max-w-4xl mx-auto">
-            {/* Phase 1 */}
-            <div className="flex gap-8 mb-12">
-              <div className="flex flex-col items-center">
-                <div className="w-4 h-4 rounded-full bg-white" />
-                <div className="w-0.5 h-full bg-zinc-800 mt-2" />
-              </div>
-              <div className="flex-1 pb-12">
-                <div className="flex items-center gap-3 mb-4">
-                  <h3 className="text-2xl font-bold text-white">Fase 1</h3>
-                </div>
-                <h4 className="text-xl font-semibold text-white mb-4">Escaneo y Acceso</h4>
-                <ul className="space-y-2 text-zinc-400">
-                  <li className="flex items-start gap-2">
-                    <span className="text-white mt-1">→</span>
-                    <span>Escanea el código QR único del poste</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span className="text-white mt-1">→</span>
-                    <span>Acceso instantáneo desde dispositivo móvil</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span className="text-white mt-1">→</span>
-                    <span>Resolución automática de Asset Tag</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span className="text-white mt-1">→</span>
-                    <span>Navegación directa a ficha del poste</span>
-                  </li>
-                </ul>
-              </div>
-            </div>
-
-            {/* Phase 2 */}
-            <div className="flex gap-8 mb-12">
-              <div className="flex flex-col items-center">
-                <div className="w-4 h-4 rounded-full bg-white" />
-                <div className="w-0.5 h-full bg-zinc-800 mt-2" />
-              </div>
-              <div className="flex-1 pb-12">
-                <div className="flex items-center gap-3 mb-4">
-                  <h3 className="text-2xl font-bold text-white">Fase 2</h3>
-                </div>
-                <h4 className="text-xl font-semibold text-white mb-4">Consulta de Información</h4>
-                <ul className="space-y-2 text-zinc-400">
-                  <li className="flex items-start gap-2">
-                    <span className="text-white mt-1">→</span>
-                    <span>Visualiza capacidad y consumo en tiempo real</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span className="text-white mt-1">→</span>
-                    <span>Revisa estado de seguridad y ubicación</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span className="text-white mt-1">→</span>
-                    <span>Accede al timeline completo de eventos</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span className="text-white mt-1">→</span>
-                    <span>Verifica attestations on-chain</span>
-                  </li>
-                </ul>
-              </div>
-            </div>
-
-            {/* Phase 3 */}
-            <div className="flex gap-8 mb-12">
-              <div className="flex flex-col items-center">
-                <div className="w-4 h-4 rounded-full bg-white" />
-                <div className="w-0.5 h-full bg-zinc-800 mt-2" />
-              </div>
-              <div className="flex-1 pb-12">
-                <div className="flex items-center gap-3 mb-4">
-                  <h3 className="text-2xl font-bold text-white">Fase 3</h3>
-                </div>
-                <h4 className="text-xl font-semibold text-white mb-4">Registro de Intervenciones</h4>
-                <ul className="space-y-2 text-zinc-400">
-                  <li className="flex items-start gap-2">
-                    <span className="text-white mt-1">→</span>
-                    <span>Registra lecturas de consumo</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span className="text-white mt-1">→</span>
-                    <span>Documenta mantenimientos realizados</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span className="text-white mt-1">→</span>
-                    <span>Reporta reemplazos de componentes</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span className="text-white mt-1">→</span>
-                    <span>Genera attestation verificable on-chain</span>
-                  </li>
-                </ul>
-              </div>
-            </div>
-
-            {/* Phase 4 */}
-            <div className="flex gap-8">
-              <div className="flex flex-col items-center">
-                <div className="w-4 h-4 rounded-full bg-white" />
-              </div>
-              <div className="flex-1">
-                <div className="flex items-center gap-3 mb-4">
-                  <h3 className="text-2xl font-bold text-white">Fase 4</h3>
-                </div>
-                <h4 className="text-xl font-semibold text-white mb-4">Análisis y Reportes</h4>
-                <ul className="space-y-2 text-zinc-400">
-                  <li className="flex items-start gap-2">
-                    <span className="text-white mt-1">→</span>
-                    <span>Dashboard ejecutivo con KPIs de flota</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span className="text-white mt-1">→</span>
-                    <span>Exportación de datos para análisis externo</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span className="text-white mt-1">→</span>
-                    <span>Monitoreo de transacciones blockchain</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span className="text-white mt-1">→</span>
-                    <span>Métricas de cache y rendimiento</span>
-                  </li>
-                </ul>
-              </div>
-            </div>
-          </div>
+          <FeaturesSection />
         </section>
 
         <section aria-labelledby="features-heading">
