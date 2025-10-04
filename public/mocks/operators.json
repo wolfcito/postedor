@@ -1,0 +1,32 @@
+[
+  {
+    "id": "op-001",
+    "address": "0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb",
+    "name": "Carlos Rodríguez",
+    "email": "carlos.rodriguez@empresa.co",
+    "role": "Technician",
+    "status": "active",
+    "addedAt": "2024-01-15T10:30:00Z",
+    "addedBy": "Admin Principal"
+  },
+  {
+    "id": "op-002",
+    "address": "0x8ba1f109551bD432803012645Ac136ddd64DBA72",
+    "name": "María González",
+    "email": "maria.gonzalez@empresa.co",
+    "role": "Supervisor",
+    "status": "active",
+    "addedAt": "2024-02-01T14:20:00Z",
+    "addedBy": "Admin Principal"
+  },
+  {
+    "id": "op-003",
+    "address": "0x5aAeb6053F3E94C9b9A09f33669435E7Ef1BeAed",
+    "name": "Juan Pérez",
+    "email": "juan.perez@empresa.co",
+    "role": "Technician",
+    "status": "inactive",
+    "addedAt": "2023-11-10T09:15:00Z",
+    "addedBy": "Admin Principal"
+  }
+]

@@ -12,6 +12,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useToast } from "@/hooks/use-toast"
 import { Loader2, Gauge, Wrench, RefreshCw } from "lucide-react"
 import { logInterventionAnalytics } from "@/lib/mock-attestation"
+import { eventStream } from "@/lib/event-stream"
+import type { PosteEvent } from "@/lib/types"
 
 interface InterventionTabsProps {
   tokenId: string
@@ -92,6 +94,34 @@ export function InterventionTabs({ tokenId }: InterventionTabsProps) {
         data = { ...data, oldSerial, newSerial }
       }
 
+      const optimisticEvent: PosteEvent = {
+        id: `optimistic-${Date.now()}`,
+        type,
+        ts: new Date().toISOString(),
+        actor: "Técnico",
+        attestationUID: "pending",
+        txHash: "pending",
+        ...(type === "READING" && {
+          deliveredKWh: data.deliveredKWh,
+          remainingKWh: data.remainingKWh,
+        }),
+        ...(type === "MAINTENANCE" && {
+          maintenanceKind: data.maintenanceKind,
+          notes: data.notes,
+        }),
+        ...(type === "REPLACEMENT" && {
+          oldSerial: data.oldSerial,
+          newSerial: data.newSerial,
+        }),
+      }
+
+      console.log("[v0] Emitting optimistic event to timeline:", optimisticEvent)
+      eventStream.emit(tokenId, {
+        type: "optimistic",
+        event: optimisticEvent,
+        submissionStart: submitStart,
+      })
+
       console.log("[v0] Submitting intervention:", data)
 
       const response = await fetch("/api/interventions", {
@@ -103,11 +133,32 @@ export function InterventionTabs({ tokenId }: InterventionTabsProps) {
       const result = await response.json()
 
       if (!response.ok) {
+        console.log("[v0] Intervention submission failed, rolling back optimistic event")
+        eventStream.emit(tokenId, {
+          type: "rollback",
+          eventId: optimisticEvent.id,
+          error: result.error || "Failed to create intervention",
+        })
         throw new Error(result.error || "Failed to create intervention")
       }
 
       const submitDuration = Date.now() - submitStart
       console.log("[v0] Intervention submitted in", submitDuration, "ms")
+
+      const confirmedEvent: PosteEvent = {
+        ...optimisticEvent,
+        id: result.event.id,
+        attestationUID: result.attestationUID,
+        txHash: result.txHash,
+        actor: result.event.actor,
+      }
+
+      console.log("[v0] Emitting confirmed event to timeline:", confirmedEvent)
+      eventStream.emit(tokenId, {
+        type: "confirmed",
+        event: confirmedEvent,
+        submissionStart: submitStart,
+      })
 
       // Log analytics
       logInterventionAnalytics(type, tokenId)
@@ -130,10 +181,7 @@ export function InterventionTabs({ tokenId }: InterventionTabsProps) {
         setNewSerial("")
       }
 
-      // Redirect back to pole page after a short delay
-      setTimeout(() => {
-        router.push(`/p/${tokenId}`)
-      }, 1500)
+      router.push(`/p/${tokenId}`)
     } catch (error) {
       console.error("[v0] Error submitting intervention:", error)
       toast({

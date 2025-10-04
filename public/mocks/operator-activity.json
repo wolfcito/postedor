@@ -1,0 +1,29 @@
+[
+  {
+    "id": "act-001",
+    "action": "added",
+    "operatorId": "op-001",
+    "operatorName": "Carlos Rodríguez",
+    "actor": "Admin Principal",
+    "timestamp": "2024-01-15T10:30:00Z",
+    "details": "Agregado como Technician"
+  },
+  {
+    "id": "act-002",
+    "action": "added",
+    "operatorId": "op-002",
+    "operatorName": "María González",
+    "actor": "Admin Principal",
+    "timestamp": "2024-02-01T14:20:00Z",
+    "details": "Agregado como Supervisor"
+  },
+  {
+    "id": "act-003",
+    "action": "deactivated",
+    "operatorId": "op-003",
+    "operatorName": "Juan Pérez",
+    "actor": "Admin Principal",
+    "timestamp": "2024-03-15T16:45:00Z",
+    "details": "Desactivado por inactividad"
+  }
+]

@@ -42,3 +42,27 @@ export interface ReplacementEvent extends BaseEvent {
 }
 
 export type PosteEvent = MaintenanceEvent | ReadingEvent | ReplacementEvent
+
+export type OperatorStatus = "active" | "inactive"
+export type OperatorRole = "Technician" | "Supervisor" | "Admin"
+
+export interface Operator {
+  id: string
+  address: string // Wallet address or identifier
+  name: string
+  email: string
+  role: OperatorRole
+  status: OperatorStatus
+  addedAt: string // ISO
+  addedBy: string
+}
+
+export interface OperatorActivity {
+  id: string
+  action: "added" | "removed" | "updated" | "activated" | "deactivated"
+  operatorId: string
+  operatorName: string
+  actor: string
+  timestamp: string // ISO
+  details?: string
+}

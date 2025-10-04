@@ -1,15 +1,16 @@
 import type { PosteEvent } from "@/lib/types"
 import { Card } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Wrench, Zap, PaintBucket, Shield, RefreshCw, Activity, TrendingUp, TrendingDown } from "lucide-react"
+import { Wrench, Zap, PaintBucket, Shield, RefreshCw, Activity, TrendingUp, TrendingDown, Loader2 } from "lucide-react"
 import { AttestationBadge } from "./attestation-badge"
 import { TxLink } from "./tx-link"
 
 interface EventsTimelineProps {
   events: PosteEvent[]
+  optimisticEventIds?: Set<string>
 }
 
-export function EventsTimeline({ events }: EventsTimelineProps) {
+export function EventsTimeline({ events, optimisticEventIds = new Set() }: EventsTimelineProps) {
   const getMaintenanceIcon = (kind: number) => {
     switch (kind) {
       case 0:
@@ -98,9 +99,13 @@ export function EventsTimeline({ events }: EventsTimelineProps) {
       {events.map((event, index) => {
         const { date, time } = formatDate(event.ts)
         const readingDelta = calculateReadingDelta(event, index)
+        const isOptimistic = optimisticEventIds.has(event.id)
 
         return (
-          <Card key={event.id} className="p-6 hover:shadow-lg transition-shadow">
+          <Card
+            key={event.id}
+            className={`p-6 hover:shadow-lg transition-shadow ${isOptimistic ? "opacity-60 border-warning" : ""}`}
+          >
             <div className="flex gap-4">
               {/* Timeline indicator */}
               <div className="flex flex-col items-center">
@@ -111,16 +116,22 @@ export function EventsTimeline({ events }: EventsTimelineProps) {
                       : getEventColor(event.type)
                   }`}
                 >
-                  {event.type === "MAINTENANCE" && (
+                  {isOptimistic ? (
+                    <Loader2 className="w-5 h-5 animate-spin" />
+                  ) : (
                     <>
-                      {(() => {
-                        const Icon = getMaintenanceIcon(event.maintenanceKind)
-                        return <Icon className="w-5 h-5" />
-                      })()}
+                      {event.type === "MAINTENANCE" && (
+                        <>
+                          {(() => {
+                            const Icon = getMaintenanceIcon(event.maintenanceKind)
+                            return <Icon className="w-5 h-5" />
+                          })()}
+                        </>
+                      )}
+                      {event.type === "READING" && <Activity className="w-5 h-5" />}
+                      {event.type === "REPLACEMENT" && <RefreshCw className="w-5 h-5" />}
                     </>
                   )}
-                  {event.type === "READING" && <Activity className="w-5 h-5" />}
-                  {event.type === "REPLACEMENT" && <RefreshCw className="w-5 h-5" />}
                 </div>
                 {index < events.length - 1 && <div className="w-0.5 h-full min-h-8 bg-border mt-2" />}
               </div>
@@ -129,10 +140,15 @@ export function EventsTimeline({ events }: EventsTimelineProps) {
               <div className="flex-1 space-y-3">
                 <div className="flex flex-wrap items-start justify-between gap-2">
                   <div>
-                    <h3 className="font-semibold text-lg">
+                    <h3 className="font-semibold text-lg flex items-center gap-2">
                       {event.type === "MAINTENANCE" && `Mantenimiento ${getMaintenanceLabel(event.maintenanceKind)}`}
                       {event.type === "READING" && "Lectura de Consumo"}
                       {event.type === "REPLACEMENT" && "Reemplazo de Equipo"}
+                      {isOptimistic && (
+                        <Badge variant="outline" className="text-xs bg-warning/10 text-warning border-warning/20">
+                          Guardando...
+                        </Badge>
+                      )}
                     </h3>
                     <p className="text-sm text-muted-foreground mt-0.5">
                       {date} • {time}
@@ -207,8 +223,12 @@ export function EventsTimeline({ events }: EventsTimelineProps) {
                     <span className="text-xs text-muted-foreground">Operador:</span>
                     <code className="text-xs font-mono bg-muted px-2 py-1 rounded">{event.actor}</code>
                   </div>
-                  <AttestationBadge uid={event.attestationUID} href={`/mock/attestation/${event.attestationUID}`} />
-                  <TxLink hash={event.txHash} href={`/mock/tx/${event.txHash}`} />
+                  {!isOptimistic && (
+                    <>
+                      <AttestationBadge uid={event.attestationUID} href={`/mock/attestation/${event.attestationUID}`} />
+                      <TxLink hash={event.txHash} href={`/mock/tx/${event.txHash}`} />
+                    </>
+                  )}
                 </div>
               </div>
             </div>
