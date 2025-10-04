@@ -2,6 +2,7 @@ import Image from "next/image"
 import { Shield, MapPin } from "lucide-react"
 import { Card } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
+import { AttestationBadge } from "@/components/attestation-badge"
 
 interface PosteHeaderProps {
   imageURI: string
@@ -9,9 +10,17 @@ interface PosteHeaderProps {
   assetTag?: string
   seguridad: number
   ubicacion: string
+  lastAttestationUID?: string
 }
 
-export function PosteHeader({ imageURI, tokenId, assetTag, seguridad, ubicacion }: PosteHeaderProps) {
+export function PosteHeader({
+  imageURI,
+  tokenId,
+  assetTag,
+  seguridad,
+  ubicacion,
+  lastAttestationUID,
+}: PosteHeaderProps) {
   const getSeguridadColor = (score: number) => {
     if (score >= 5) return "bg-success/10 text-success border-success/20"
     if (score >= 0) return "bg-warning/10 text-warning border-warning/20"
@@ -53,7 +62,7 @@ export function PosteHeader({ imageURI, tokenId, assetTag, seguridad, ubicacion 
             </div>
           </div>
 
-          <div className="pt-2">
+          <div className="pt-2 space-y-2">
             <p className="text-sm text-muted-foreground">
               Última actualización:{" "}
               <span className="text-foreground font-medium">
@@ -64,6 +73,12 @@ export function PosteHeader({ imageURI, tokenId, assetTag, seguridad, ubicacion 
                 })}
               </span>
             </p>
+            {lastAttestationUID && (
+              <div className="flex items-center gap-2">
+                <span className="text-sm text-muted-foreground">Verificación:</span>
+                <AttestationBadge uid={lastAttestationUID} />
+              </div>
+            )}
           </div>
         </div>
       </div>

@@ -7,15 +7,25 @@ import { EventsTimeline } from "@/components/events-timeline"
 import { Zap, TrendingUp, TrendingDown, Shield } from "lucide-react"
 import { Card } from "@/components/ui/card"
 
-export const dynamic = "force-dynamic"
+export const revalidate = 60
+
+export async function generateStaticParams() {
+  return [{ tokenId: "1" }, { tokenId: "2" }]
+}
 
 interface PageProps {
   params: Promise<{ tokenId: string }>
 }
 
 async function PosteContent({ tokenId }: { tokenId: string }) {
+  const fetchStart = Date.now()
+  console.log("[v0] Fetching data for pole", tokenId)
+
   try {
     const [poste, events] = await Promise.all([getPosteByTokenId(tokenId), getEventsByTokenId(tokenId)])
+
+    const fetchDuration = Date.now() - fetchStart
+    console.log("[v0] Data fetched in", fetchDuration, "ms")
 
     return (
       <div className="min-h-screen bg-background">
@@ -28,6 +38,7 @@ async function PosteContent({ tokenId }: { tokenId: string }) {
               assetTag={poste.assetTag}
               seguridad={poste.seguridad}
               ubicacion={poste.ubicacion}
+              lastAttestationUID={poste.lastAttestationUID}
             />
 
             {/* Stats Grid */}
@@ -70,6 +81,7 @@ async function PosteContent({ tokenId }: { tokenId: string }) {
       </div>
     )
   } catch (error) {
+    console.log("[v0] Error fetching pole data:", error)
     notFound()
   }
 }
@@ -98,6 +110,8 @@ function LoadingSkeleton() {
 
 export default async function PostePage({ params }: PageProps) {
   const { tokenId } = await params
+
+  console.log("[v0] Rendering pole page for tokenId:", tokenId)
 
   return (
     <Suspense fallback={<LoadingSkeleton />}>
