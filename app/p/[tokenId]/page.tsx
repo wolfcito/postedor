@@ -8,6 +8,7 @@ import { Zap, TrendingUp, TrendingDown, Shield } from "lucide-react"
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
+import { TwitterShareButton } from "@/components/twitter-share-button"
 
 export const revalidate = 60
 
@@ -43,6 +44,10 @@ async function PosteContent({ tokenId }: { tokenId: string }) {
               ubicacion={poste.ubicacion}
               lastAttestationUID={poste.lastAttestationUID}
             />
+
+            <div className="flex justify-end">
+              <TwitterShareButton tokenId={poste.tokenId} assetTag={poste.assetTag} ubicacion={poste.ubicacion} />
+            </div>
 
             {/* Stats Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">

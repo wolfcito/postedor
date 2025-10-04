@@ -12,6 +12,9 @@ import { Loader2, CheckCircle2, AlertCircle, ArrowLeft } from "lucide-react"
 import { PolePreviewCard } from "@/components/pole-preview-card"
 import { QRCodePreview } from "@/components/qr-code-preview"
 import Link from "next/link"
+import { TransactionPreviewDialog } from "@/components/transaction-preview-dialog"
+import { TransactionStatusTracker } from "@/components/transaction-status-tracker"
+import { submitTransaction, type MockTransaction } from "@/lib/mock-blockchain-tx"
 
 export default function MintPolePage() {
   const router = useRouter()
@@ -19,6 +22,8 @@ export default function MintPolePage() {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [mintedPoste, setMintedPoste] = useState<any>(null)
   const [showPreview, setShowPreview] = useState(false)
+  const [showTxPreview, setShowTxPreview] = useState(false)
+  const [currentTx, setCurrentTx] = useState<MockTransaction | null>(null)
 
   // Form state
   const [formData, setFormData] = useState({
@@ -90,10 +95,28 @@ export default function MintPolePage() {
   const handleSubmit = async () => {
     if (!validateForm()) return
 
+    setShowTxPreview(true)
+  }
+
+  const handleConfirmTransaction = async () => {
+    setShowTxPreview(false)
     setIsSubmitting(true)
     const startTime = Date.now()
 
     try {
+      // Submit blockchain transaction
+      const tx = await submitTransaction("mint", {
+        ...formData,
+        capacidadKW: Number(formData.capacidadKW),
+        seguridad: Number(formData.seguridad),
+        consumoEntregado: Number(formData.consumoEntregado),
+        consumoRestante: Number(formData.consumoRestante || formData.capacidadKW) * 1000,
+      })
+
+      setCurrentTx(tx)
+
+      // Wait for transaction to be confirmed
+      // In parallel, call the API to create the pole
       const response = await fetch("/api/admin/mint", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -103,6 +126,7 @@ export default function MintPolePage() {
           seguridad: Number(formData.seguridad),
           consumoEntregado: Number(formData.consumoEntregado),
           consumoRestante: Number(formData.consumoRestante || formData.capacidadKW) * 1000,
+          txHash: tx.hash,
         }),
       })
 
@@ -125,15 +149,14 @@ export default function MintPolePage() {
       setMintedPoste(data.poste)
       toast({
         title: "Poste creado exitosamente",
-        description: `Poste #${data.poste.tokenId} registrado con asset tag ${data.poste.assetTag}`,
+        description: `Poste #${data.poste.tokenId} registrado con tx ${tx.hash.slice(0, 10)}...`,
       })
 
       console.log("[v0] [MINT] Success:", {
         tokenId: data.poste.tokenId,
         assetTag: data.poste.assetTag,
+        txHash: tx.hash,
         duration: Date.now() - startTime,
-        hashes: data.hashes,
-        attestationUID: data.attestationUID,
       })
     } catch (error) {
       console.error("[v0] [MINT] Error:", error)
@@ -395,6 +418,28 @@ export default function MintPolePage() {
           )}
         </div>
       </div>
+
+      <TransactionPreviewDialog
+        open={showTxPreview}
+        onOpenChange={setShowTxPreview}
+        operation="mint"
+        data={formData}
+        onConfirm={handleConfirmTransaction}
+      />
+
+      {currentTx && isSubmitting && (
+        <div className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="w-full max-w-md">
+            <TransactionStatusTracker
+              transaction={currentTx}
+              onComplete={() => {
+                setCurrentTx(null)
+                setIsSubmitting(false)
+              }}
+            />
+          </div>
+        </div>
+      )}
     </div>
   )
 }
