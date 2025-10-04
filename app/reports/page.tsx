@@ -3,9 +3,10 @@
 import { useState, useEffect } from "react"
 import { ReportFilters } from "@/components/report-filters"
 import { ReportKPICards } from "@/components/report-kpi-cards"
+import { ExportDialog } from "@/components/export-dialog"
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { AlertCircle, BarChart3, RefreshCw } from "lucide-react"
+import { AlertCircle, BarChart3, RefreshCw, Download } from "lucide-react"
 import type { ReportKPIs, ReportFilters as Filters } from "@/lib/types"
 
 export default function ReportsPage() {
@@ -14,6 +15,7 @@ export default function ReportsPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [locations, setLocations] = useState<string[]>([])
+  const [exportDialogOpen, setExportDialogOpen] = useState(false)
 
   const fetchReports = async () => {
     const startTime = Date.now()
@@ -101,10 +103,16 @@ export default function ReportsPage() {
       <div className="mb-8">
         <div className="flex items-center justify-between mb-2">
           <h1 className="text-3xl font-bold">Reportes Ejecutivos</h1>
-          <Button variant="outline" size="sm" onClick={fetchReports} disabled={loading}>
-            <RefreshCw className={`h-4 w-4 mr-2 ${loading ? "animate-spin" : ""}`} />
-            Actualizar
-          </Button>
+          <div className="flex gap-2">
+            <Button variant="outline" size="sm" onClick={() => setExportDialogOpen(true)} disabled={loading || isEmpty}>
+              <Download className="h-4 w-4 mr-2" />
+              Exportar
+            </Button>
+            <Button variant="outline" size="sm" onClick={fetchReports} disabled={loading}>
+              <RefreshCw className={`h-4 w-4 mr-2 ${loading ? "animate-spin" : ""}`} />
+              Actualizar
+            </Button>
+          </div>
         </div>
         <p className="text-muted-foreground">Análisis de KPIs y puntos críticos de la flota</p>
       </div>
@@ -183,6 +191,8 @@ export default function ReportsPage() {
           )}
         </>
       )}
+
+      <ExportDialog open={exportDialogOpen} onOpenChange={setExportDialogOpen} filters={filters} />
     </div>
   )
 }

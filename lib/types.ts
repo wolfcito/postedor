@@ -95,3 +95,25 @@ export interface ReportKPIs {
     count: number
   }>
 }
+
+export interface ExportPoleData {
+  tokenId: string
+  assetTag: string
+  ubicacion: string
+  capacidadKW: number
+  consumoEntregado: number
+  consumoRestante: number
+  seguridad: number
+  interventionCount: number
+  lastAttestationUID: string
+  updatedAt: string
+}
+
+export type ExportFormat = "csv" | "json"
+
+export interface ExportMetadata {
+  exportedAt: string
+  filters: ReportFilters
+  totalRecords: number
+  format: ExportFormat
+}

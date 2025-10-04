@@ -126,7 +126,7 @@ importers:
         specifier: latest
         version: 6.15.0
       fs:
-        specifier: 0.0.1-security
+        specifier: latest
         version: 0.0.1-security
       geist:
         specifier: latest
@@ -144,7 +144,7 @@ importers:
         specifier: latest
         version: 0.4.6(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
       path:
-        specifier: 0.12.7
+        specifier: latest
         version: 0.12.7
       qrcode.react:
         specifier: latest
