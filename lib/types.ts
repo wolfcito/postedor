@@ -66,3 +66,32 @@ export interface OperatorActivity {
   timestamp: string // ISO
   details?: string
 }
+
+export interface ReportFilters {
+  startDate?: string // ISO date
+  endDate?: string // ISO date
+  ubicacion?: string // City or location filter
+  seguridadMinima?: number // Minimum security score
+}
+
+export interface ReportKPIs {
+  totalPoles: number
+  totalInterventions: number
+  maintenanceCount: number
+  readingCount: number
+  replacementCount: number
+  averageSeguridad: number
+  topIncidents: Array<{
+    kind: number
+    count: number
+    label: string
+  }>
+  polesByLocation: Array<{
+    location: string
+    count: number
+  }>
+  interventionsByDate: Array<{
+    date: string
+    count: number
+  }>
+}
