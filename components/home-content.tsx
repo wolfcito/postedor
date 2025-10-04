@@ -92,7 +92,7 @@ export function HomeContent() {
             Postedor redefine la infraestructura eléctrica
           </h1>
           <p className="text-xl md:text-2xl text-zinc-400 text-balance max-w-3xl mx-auto leading-relaxed">
-            Impulsados por blockchain, los agentes evolucionan a través de capas, protocolos y el tiempo, transformando los postes eléctricos de simples endpoints a sistemas de acción.
+            La arquitectura de agentes sobre blockchain habilita la evolución de la infraestructura eléctrica: de endpoints pasivos a sistemas de acción interoperables.
           </p>
 
           <div className="flex items-center justify-center gap-4 mt-10">
