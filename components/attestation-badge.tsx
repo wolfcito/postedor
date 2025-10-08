@@ -21,7 +21,7 @@ export function AttestationBadge({ uid, href }: AttestationBadgeProps) {
     attester: "0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb",
     timestamp: new Date().toISOString(),
     status: "Verified",
-    chain: "Base Sepolia",
+    chain: "Polkadot Sepolia",
   }
 
   const content = (

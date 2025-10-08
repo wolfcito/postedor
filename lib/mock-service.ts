@@ -11,14 +11,14 @@ function getBaseUrl() {
 }
 
 async function getPostesData(): Promise<Poste[]> {
-  const response = await fetch(new URL("/mocks/postes.json", getBaseUrl()), { cache: "no-store" })
+  const response = await fetch(new URL("/mocks/postes.json", getBaseUrl()), { next: { revalidate: 60 } })
   if (!response.ok) throw new Error("Failed to load postes data")
   return response.json()
 }
 
 async function getEventsData(tokenId: string): Promise<PosteEvent[]> {
   try {
-    const response = await fetch(new URL(`/mocks/events-${tokenId}.json`, getBaseUrl()), { cache: "no-store" })
+    const response = await fetch(new URL(`/mocks/events-${tokenId}.json`, getBaseUrl()), { next: { revalidate: 60 } })
     if (!response.ok) return []
     return response.json()
   } catch {
