@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { QrCode, Zap, Activity, Shield, Search, ArrowRight, CheckCircle2, Sparkles } from "lucide-react"
 import Link from "next/link"
-import { useEffect, useState, useMemo } from "react"
+import { useEffect, useState } from "react"
 import { useSearchParams, useRouter } from "next/navigation"
 import { useToast } from "@/hooks/use-toast"
 import { DemoSection } from "./demo-section"
@@ -19,17 +19,19 @@ export function HomeContent() {
   const { toast } = useToast()
   const [assetTag, setAssetTag] = useState("")
   const [isResolving, setIsResolving] = useState(false)
+  const [stars, setStars] = useState<Array<{ left: number; top: number; animationDelay: number; animationDuration: number }>>([])
 
-  const stars = useMemo(
-    () =>
-      [...Array(50)].map((_, i) => ({
+  useEffect(() => {
+    // Generate stars only on client side to avoid hydration mismatch
+    setStars(
+      [...Array(50)].map(() => ({
         left: Math.random() * 100,
         top: Math.random() * 100,
         animationDelay: Math.random() * 3,
         animationDuration: 2 + Math.random() * 3,
-      })),
-    []
-  )
+      }))
+    )
+  }, [])
 
   useEffect(() => {
     if (searchParams.get("error") === "not-found") {
