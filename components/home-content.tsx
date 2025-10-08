@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { QrCode, Zap, Activity, Shield, Search, ArrowRight, CheckCircle2, Sparkles } from "lucide-react"
 import Link from "next/link"
-import { useEffect, useState } from "react"
+import { useEffect, useState, useMemo } from "react"
 import { useSearchParams, useRouter } from "next/navigation"
 import { useToast } from "@/hooks/use-toast"
 import { DemoSection } from "./demo-section"
@@ -19,6 +19,17 @@ export function HomeContent() {
   const { toast } = useToast()
   const [assetTag, setAssetTag] = useState("")
   const [isResolving, setIsResolving] = useState(false)
+
+  const stars = useMemo(
+    () =>
+      [...Array(50)].map((_, i) => ({
+        left: Math.random() * 100,
+        top: Math.random() * 100,
+        animationDelay: Math.random() * 3,
+        animationDuration: 2 + Math.random() * 3,
+      })),
+    []
+  )
 
   useEffect(() => {
     if (searchParams.get("error") === "not-found") {
@@ -64,15 +75,15 @@ export function HomeContent() {
     <div className="min-h-screen bg-black relative overflow-hidden">
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="stars-container">
-          {[...Array(50)].map((_, i) => (
+          {stars.map((star, i) => (
             <div
               key={i}
               className="star"
               style={{
-                left: `${Math.random() * 100}%`,
-                top: `${Math.random() * 100}%`,
-                animationDelay: `${Math.random() * 3}s`,
-                animationDuration: `${2 + Math.random() * 3}s`,
+                left: `${star.left}%`,
+                top: `${star.top}%`,
+                animationDelay: `${star.animationDelay}s`,
+                animationDuration: `${star.animationDuration}s`,
               }}
             />
           ))}
