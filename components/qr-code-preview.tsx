@@ -11,8 +11,9 @@ interface QRCodePreviewProps {
   assetTag: string
 }
 
-export function QRCodePreview({ tokenId, assetTag }: QRCodePreviewProps) {
-  const qrUrl = `${typeof window !== "undefined" ? window.location.origin : ""}/p/${tokenId}`
+export function QRCodePreview({ tokenId: _tokenId, assetTag }: QRCodePreviewProps) {
+  const baseUrl = typeof window !== "undefined" ? window.location.origin : ""
+  const qrUrl = `${baseUrl}/p/${assetTag}`
 
   const handleDownload = () => {
     const svg = document.getElementById("qr-code-svg")

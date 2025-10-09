@@ -1,32 +1,41 @@
 import { Suspense } from "react"
 import { notFound } from "next/navigation"
-import { getPosteByTokenId, getEventsByTokenId } from "@/lib/mock-service"
-import { PosteHeader } from "@/components/poste-header"
-import { StatCard } from "@/components/stat-card"
-import { TimelineWithRefresh } from "@/components/timeline-with-refresh"
-import { Zap, TrendingUp, TrendingDown, Shield } from "lucide-react"
+import { getPosteByTokenId, getEventsByTokenId, resolveAssetTag } from "@/lib/mock-service"
 import { Card } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import Link from "next/link"
-import { TwitterShareButton } from "@/components/twitter-share-button"
 import { PosteContentClient } from "@/components/poste-content-client"
 
 export const revalidate = 60
 
 export async function generateStaticParams() {
-  return [{ tokenId: "1" }, { tokenId: "2" }]
+  try {
+    const fs = await import("fs/promises")
+    const path = await import("path")
+    const filePath = path.join(process.cwd(), "public", "mocks", "postes.json")
+    const fileContent = await fs.readFile(filePath, "utf-8")
+    const postes = JSON.parse(fileContent) as Array<{ assetTag: string }>
+    return postes.slice(0, 10).map((poste) => ({ assetTag: poste.assetTag }))
+  } catch {
+    return []
+  }
 }
 
 interface PageProps {
-  params: Promise<{ tokenId: string }>
+  params: Promise<{ assetTag: string }>
 }
 
-async function PosteContent({ tokenId }: { tokenId: string }) {
+async function PosteContent({ assetTag }: { assetTag: string }) {
   const fetchStart = Date.now()
-  console.log("[v0] Fetching data for pole", tokenId)
+  console.log("[v0] Fetching data for pole", { assetTag })
 
   try {
-    const [poste, events] = await Promise.all([getPosteByTokenId(tokenId), getEventsByTokenId(tokenId)])
+    const { tokenId } = await resolveAssetTag(assetTag)
+
+    const metadata = { assetTag }
+
+    const [poste, events] = await Promise.all([
+      getPosteByTokenId(tokenId, metadata),
+      getEventsByTokenId(tokenId, metadata),
+    ])
 
     const fetchDuration = Date.now() - fetchStart
     console.log("[v0] Data fetched in", fetchDuration, "ms")
@@ -70,13 +79,13 @@ function LoadingSkeleton() {
 }
 
 export default async function PostePage({ params }: PageProps) {
-  const { tokenId } = await params
+  const { assetTag } = await params
 
-  console.log("[v0] Rendering pole page for tokenId:", tokenId)
+  console.log("[v0] Rendering pole page for assetTag:", assetTag)
 
   return (
     <Suspense fallback={<LoadingSkeleton />}>
-      <PosteContent tokenId={tokenId} />
+      <PosteContent assetTag={assetTag} />
     </Suspense>
   )
 }

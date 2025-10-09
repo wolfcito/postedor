@@ -16,6 +16,7 @@ async function InterventionContent({ tokenId }: { tokenId: string }) {
 
   try {
     const poste = await getPosteByTokenId(tokenId)
+    const assetTag = poste.assetTag ?? `POSTE-${tokenId}`
 
     return (
       <div className="min-h-screen bg-background">
@@ -24,7 +25,7 @@ async function InterventionContent({ tokenId }: { tokenId: string }) {
             {/* Header */}
             <div className="flex items-center gap-4">
               <Button variant="ghost" size="icon" asChild>
-                <Link href={`/p/${tokenId}`}>
+                <Link href={`/p/${assetTag}`}>
                   <ArrowLeft className="h-5 w-5" />
                   <span className="sr-only">Volver al poste</span>
                 </Link>
@@ -32,7 +33,7 @@ async function InterventionContent({ tokenId }: { tokenId: string }) {
               <div>
                 <h1 className="text-3xl font-bold">Nueva Intervención</h1>
                 <p className="text-muted-foreground">
-                  Poste #{tokenId} - {poste.ubicacion}
+                  Poste {assetTag} (#{tokenId}) - {poste.ubicacion}
                 </p>
               </div>
             </div>

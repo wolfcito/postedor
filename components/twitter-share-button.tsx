@@ -11,8 +11,9 @@ interface TwitterShareButtonProps {
 
 export function TwitterShareButton({ tokenId, assetTag, ubicacion }: TwitterShareButtonProps) {
   const handleShare = () => {
-    const url = `${process.env.NEXT_PUBLIC_APP_URL || window.location.origin}/p/${tokenId}`
-    const text = `Poste #${tokenId}${assetTag ? ` (${assetTag})` : ""}${ubicacion ? ` - ${ubicacion}` : ""}`
+    const slug = assetTag ?? tokenId
+    const url = `${process.env.NEXT_PUBLIC_APP_URL || window.location.origin}/p/${slug}`
+    const text = `Poste ${assetTag ?? `#${tokenId}`}${assetTag ? ` (#${tokenId})` : ""}${ubicacion ? ` - ${ubicacion}` : ""}`
     const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`
 
     window.open(twitterUrl, "_blank", "noopener,noreferrer,width=550,height=420")

@@ -8,25 +8,26 @@ interface PageProps {
 export default async function AssetTagPage({ params }: PageProps) {
   const startTime = Date.now()
   const { assetTag } = await params
+  const normalized = assetTag.trim()
 
-  console.log("[v0:telemetry] Asset tag lookup started", { assetTag })
+  console.log("[v0:telemetry] Asset tag lookup started", { assetTag: normalized })
 
   try {
-    const { tokenId } = await resolveAssetTag(assetTag)
+    const { tokenId } = await resolveAssetTag(normalized)
     const duration = Date.now() - startTime
 
     console.log("[v0:telemetry] Asset tag resolved successfully", {
-      assetTag,
+      assetTag: normalized,
       tokenId,
       duration: `${duration}ms`,
     })
 
-    redirect(`/p/${tokenId}`)
+    redirect(`/p/${normalized}`)
   } catch (error) {
     const duration = Date.now() - startTime
 
     console.log("[v0:telemetry] Asset tag lookup failed", {
-      assetTag,
+      assetTag: normalized,
       error: error instanceof Error ? error.message : "Unknown error",
       duration: `${duration}ms`,
     })

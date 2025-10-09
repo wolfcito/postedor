@@ -36,33 +36,37 @@ async function getEventsData(tokenId: string): Promise<PosteEvent[]> {
   return []
 }
 
-async function readContractPoste(
-  tokenId: string,
-  metadata?: {
-    assetTag?: string
-    ubicacion?: string
-    imageURI?: string
-  },
-): Promise<Poste | null> {
+type PosteMetadataInput = {
+  assetTag?: string
+  ubicacion?: string
+  imageURI?: string
+}
+
+async function readContractPoste(tokenId: string, metadata?: PosteMetadataInput, options?: { blockNumber?: bigint }) {
   if (typeof window !== "undefined") {
     return null
   }
 
   const { readPosteFromContract } = await import("./contract-reader.server")
-  return readPosteFromContract(tokenId, metadata)
+  return readPosteFromContract(tokenId, metadata, options)
 }
 
-export async function getPosteByTokenId(tokenId: string): Promise<PosteWithSource> {
+function mergeMetadata(primary?: PosteMetadataInput, fallback?: PosteMetadataInput): PosteMetadataInput {
+  return {
+    assetTag: primary?.assetTag ?? fallback?.assetTag,
+    ubicacion: primary?.ubicacion ?? fallback?.ubicacion,
+    imageURI: primary?.imageURI ?? fallback?.imageURI,
+  }
+}
+
+export async function getPosteByTokenId(tokenId: string, metadata?: PosteMetadataInput): Promise<PosteWithSource> {
   const postes = await getPostesData()
   const fallbackPoste = postes.find((d) => d.tokenId === tokenId)
+  const mergedMetadata = mergeMetadata(metadata, fallbackPoste)
 
   // First, try to read from the blockchain contract using mock metadata for richer display
   console.log(`[mock-service] Attempting to read poste ${tokenId} from contract`)
-  const contractPoste = await readContractPoste(tokenId, {
-    assetTag: fallbackPoste?.assetTag,
-    ubicacion: fallbackPoste?.ubicacion,
-    imageURI: fallbackPoste?.imageURI,
-  })
+  const contractPoste = await readContractPoste(tokenId, mergedMetadata)
 
   if (contractPoste) {
     console.log(`[mock-service] Found poste ${tokenId} in contract`)
@@ -80,6 +84,7 @@ export async function getPosteByTokenId(tokenId: string): Promise<PosteWithSourc
     console.log(`[mock-service] Found poste ${tokenId} in mock data`)
     return {
       ...fallbackPoste,
+      ...mergedMetadata,
       source: "mock",
     }
   }
@@ -88,16 +93,77 @@ export async function getPosteByTokenId(tokenId: string): Promise<PosteWithSourc
 }
 
 export async function resolveAssetTag(assetTag: string): Promise<{ tokenId: string }> {
-  const hash = hashAssetTag(assetTag)
-  console.log("[v0:mock] Asset tag hashed", { assetTag, hash })
+  const normalized = assetTag.trim()
+  const hash = hashAssetTag(normalized)
+  console.log("[v0:mock] Asset tag hashed", { assetTag: normalized, hash })
+
+  if (typeof window === "undefined") {
+    try {
+      const { getTokenIdByAssetTag } = await import("./contract-reader.server")
+      const tokenFromContract = await getTokenIdByAssetTag(normalized)
+      if (tokenFromContract) {
+        console.log("[mock-service] Asset tag resolved from contract", { assetTag: normalized, tokenId: tokenFromContract })
+        return { tokenId: tokenFromContract }
+      }
+    } catch (error) {
+      console.error("[mock-service] Error resolving asset tag from contract:", error)
+    }
+  }
 
   const data = await getPostesData()
-  const poste = data.find((d) => d.assetTag === assetTag)
-  if (!poste) throw new Error("AssetTag no encontrado")
-  return { tokenId: poste.tokenId }
+  const posteByAssetTag = data.find((d) => d.assetTag === normalized)
+  if (posteByAssetTag) {
+    return { tokenId: posteByAssetTag.tokenId }
+  }
+
+  const posteByTokenId = data.find((d) => d.tokenId === normalized)
+  if (posteByTokenId) {
+    return { tokenId: posteByTokenId.tokenId }
+  }
+
+  throw new Error("AssetTag no encontrado")
 }
 
-export async function getEventsByTokenId(tokenId: string): Promise<PosteEvent[]> {
+export async function getEventsByTokenId(tokenId: string, metadata?: PosteMetadataInput): Promise<PosteEvent[]> {
+  let contractEvents: PosteEvent[] = []
+
+  if (typeof window === "undefined") {
+    try {
+      const { getPosteSnapshotsFromContract } = await import("./contract-reader.server")
+      const snapshots = await getPosteSnapshotsFromContract(tokenId, metadata)
+
+      if (snapshots.length > 0) {
+        console.log("[mock-service] Loaded events from contract", {
+          tokenId,
+          count: snapshots.length,
+        })
+
+        contractEvents = snapshots.map((snapshot) => ({
+          id: `${snapshot.transactionHash}-${snapshot.logIndex}`,
+          tokenId: snapshot.tokenId,
+          type: "READING",
+          actor: snapshot.actor ?? "Operador desconocido",
+          attestationUID: snapshot.poste.lastAttestationUID ?? "",
+          txHash: snapshot.transactionHash,
+          ts: snapshot.timestamp,
+          deliveredKWh: snapshot.poste.consumoEntregado,
+          remainingKWh: snapshot.poste.consumoRestante,
+        }))
+      }
+    } catch (error) {
+      console.error("[mock-service] Error loading events from contract:", error)
+    }
+  }
+
   const data = await getEventsData(tokenId)
-  return data.sort((a, b) => +new Date(b.ts) - +new Date(a.ts))
+  const sortedFallback = data.sort((a, b) => +new Date(b.ts) - +new Date(a.ts))
+
+  if (contractEvents.length === 0) {
+    return sortedFallback
+  }
+
+  const knownIds = new Set(contractEvents.map((event) => event.id))
+  const merged = [...contractEvents, ...sortedFallback.filter((event) => !knownIds.has(event.id))]
+
+  return merged.sort((a, b) => +new Date(b.ts) - +new Date(a.ts))
 }

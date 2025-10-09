@@ -347,7 +347,7 @@ export default function MintPolePage() {
         </div>
 
         <div className="flex gap-3">
-          <Button onClick={() => router.push(`/p/${mintedPoste.tokenId}`)} size="lg" className="flex-1">
+          <Button onClick={() => router.push(`/p/${mintedPoste.assetTag}`)} size="lg" className="flex-1">
             Ver Poste
           </Button>
           <Button

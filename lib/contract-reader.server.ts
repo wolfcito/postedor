@@ -1,3 +1,9 @@
 import "server-only"
 
-export { readPosteFromContract, getNextTokenId } from "./contract-reader"
+export {
+  readPosteFromContract,
+  getNextTokenId,
+  getTokenIdByAssetTag,
+  getTokenIdByAssetTagHash,
+  getPosteSnapshotsFromContract,
+} from "./contract-reader"
