@@ -1,29 +1,39 @@
 import type { Poste, PosteEvent } from "./types"
 import { hashAssetTag } from "./hash-utils"
 
-function getBaseUrl() {
-  const envUrl =
-    process.env.NEXT_PUBLIC_APP_URL ??
-    process.env.NEXT_PUBLIC_SITE_URL ??
-    (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : undefined)
-
-  return envUrl ?? "http://localhost:3000"
-}
-
 async function getPostesData(): Promise<Poste[]> {
-  const response = await fetch(new URL("/mocks/postes.json", getBaseUrl()), { next: { revalidate: 60 } })
-  if (!response.ok) throw new Error("Failed to load postes data")
-  return response.json()
+  // En servidor, usar filesystem para evitar fetch a localhost durante build
+  if (typeof window === "undefined") {
+    try {
+      const fs = await import("fs/promises")
+      const path = await import("path")
+      const filePath = path.join(process.cwd(), "public", "mocks", "postes.json")
+      const fileContent = await fs.readFile(filePath, "utf-8")
+      return JSON.parse(fileContent)
+    } catch (error) {
+      console.error("Error reading postes.json from filesystem:", error)
+      throw new Error("Failed to load postes data")
+    }
+  }
+
+  throw new Error("Client-side access not supported")
 }
 
 async function getEventsData(tokenId: string): Promise<PosteEvent[]> {
-  try {
-    const response = await fetch(new URL(`/mocks/events-${tokenId}.json`, getBaseUrl()), { next: { revalidate: 60 } })
-    if (!response.ok) return []
-    return response.json()
-  } catch {
-    return []
+  // En servidor, usar filesystem para evitar fetch a localhost durante build
+  if (typeof window === "undefined") {
+    try {
+      const fs = await import("fs/promises")
+      const path = await import("path")
+      const filePath = path.join(process.cwd(), "public", "mocks", `events-${tokenId}.json`)
+      const fileContent = await fs.readFile(filePath, "utf-8")
+      return JSON.parse(fileContent)
+    } catch {
+      return []
+    }
   }
+
+  return []
 }
 
 export async function getPosteByTokenId(tokenId: string): Promise<Poste> {
