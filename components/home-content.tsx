@@ -203,6 +203,11 @@ export function HomeContent() {
                   </Link>
                 </li>
                 <li>
+                  <Link href="/admin/inventory" className="hover:text-white transition-colors">
+                    Inventario
+                  </Link>
+                </li>
+                <li>
                   <Link href="/admin/mint" className="hover:text-white transition-colors">
                     Admin
                   </Link>

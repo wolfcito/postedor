@@ -19,6 +19,10 @@ async function getPostesData(): Promise<Poste[]> {
   throw new Error("Client-side access not supported")
 }
 
+export async function listFallbackPostes(): Promise<Poste[]> {
+  return getPostesData()
+}
+
 async function getEventsData(tokenId: string): Promise<PosteEvent[]> {
   // En servidor, usar filesystem para evitar fetch a localhost durante build
   if (typeof window === "undefined") {
