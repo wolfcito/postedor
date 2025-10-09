@@ -63,10 +63,26 @@ export function useMintPoste() {
     seguridad: number,
     imageURIHash: `0x${string}`
   ) => {
+    console.log("[v0] [MINT] Calling contract with:", {
+      to,
+      assetTagHash,
+      ubicacionHash,
+      capacidadKW,
+      seguridad,
+      imageURIHash,
+    })
+
     writeContract({
       ...CONTRACTS.postedor,
       functionName: "mintPoste",
-      args: [to, assetTagHash, ubicacionHash, capacidadKW, seguridad, imageURIHash],
+      args: [
+        to,
+        assetTagHash,
+        ubicacionHash,
+        capacidadKW as any, // Cast to uint32
+        seguridad as any, // Cast to int8
+        imageURIHash,
+      ],
     })
   }
 

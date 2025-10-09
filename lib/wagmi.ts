@@ -1,9 +1,33 @@
 import { http, createConfig } from "wagmi"
 import { defineChain } from "viem"
+import { injected, walletConnect } from "wagmi/connectors"
 
-// Define Polkadot Asset Hub chain configuration
+// Define Polkadot Asset Hub Testnet (Paseo Network)
+export const polkadotAssetHubTestnet = defineChain({
+  id: 420420422,
+  name: "Polkadot Hub TestNet",
+  nativeCurrency: {
+    decimals: 18,
+    name: "PAS",
+    symbol: "PAS",
+  },
+  rpcUrls: {
+    default: {
+      http: ["https://testnet-passet-hub-eth-rpc.polkadot.io"],
+    },
+  },
+  blockExplorers: {
+    default: {
+      name: "Paseo Asset Hub Explorer",
+      url: "https://blockscout-passet-hub.parity-testnet.parity.io",
+    },
+  },
+  testnet: true,
+})
+
+// Define Polkadot Asset Hub Mainnet
 export const polkadotAssetHub = defineChain({
-  id: 420420421, // Chain ID for Polkadot Asset Hub
+  id: 420420420,
   name: "Polkadot Asset Hub",
   nativeCurrency: {
     decimals: 10,
@@ -22,20 +46,31 @@ export const polkadotAssetHub = defineChain({
       url: "https://assethub-polkadot.subscan.io",
     },
   },
-  contracts: {
-    // Add your deployed contract addresses here
-    // Example:
-    // postedor: {
-    //   address: "0x...",
-    //   blockCreated: 0,
-    // },
-  },
 })
+
+// WalletConnect Project ID - Get from https://cloud.walletconnect.com
+const projectId = process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID || "demo-project-id"
 
 // Create Wagmi configuration
 export const config = createConfig({
-  chains: [polkadotAssetHub],
+  chains: [polkadotAssetHubTestnet, polkadotAssetHub],
+  connectors: [
+    injected({
+      shimDisconnect: true,
+    }),
+    walletConnect({
+      projectId,
+      showQrModal: true,
+      metadata: {
+        name: "Postedor",
+        description: "Sistema de gestión de postes eléctricos en blockchain",
+        url: typeof window !== "undefined" ? window.location.origin : "https://postedor.app",
+        icons: ["https://postedor.app/icon.png"],
+      },
+    }),
+  ],
   transports: {
+    [polkadotAssetHubTestnet.id]: http(),
     [polkadotAssetHub.id]: http(),
   },
 })

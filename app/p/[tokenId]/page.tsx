@@ -9,6 +9,7 @@ import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
 import { TwitterShareButton } from "@/components/twitter-share-button"
+import { PosteContentClient } from "@/components/poste-content-client"
 
 export const revalidate = 60
 
@@ -31,69 +32,7 @@ async function PosteContent({ tokenId }: { tokenId: string }) {
     console.log("[v0] Data fetched in", fetchDuration, "ms")
     console.log("[v0] Timeline loaded with", events.length, "events")
 
-    return (
-      <div className="min-h-screen bg-background">
-        <div className="container mx-auto px-4 py-8 max-w-6xl">
-          <div className="space-y-8">
-            {/* Header */}
-            <PosteHeader
-              imageURI={poste.imageURI}
-              tokenId={poste.tokenId}
-              assetTag={poste.assetTag}
-              seguridad={poste.seguridad}
-              ubicacion={poste.ubicacion}
-              lastAttestationUID={poste.lastAttestationUID}
-            />
-
-            <div className="flex justify-end">
-              <TwitterShareButton tokenId={poste.tokenId} assetTag={poste.assetTag} ubicacion={poste.ubicacion} />
-            </div>
-
-            {/* Stats Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-              <StatCard label="Capacidad" value={poste.capacidadKW} unit="kW" icon={Zap} />
-              <StatCard
-                label="Consumo Entregado"
-                value={poste.consumoEntregado}
-                unit="kWh"
-                icon={TrendingUp}
-                trend="up"
-              />
-              <StatCard
-                label="Consumo Restante"
-                value={poste.consumoRestante}
-                unit="kWh"
-                icon={TrendingDown}
-                trend="down"
-              />
-              <StatCard
-                label="Índice de Seguridad"
-                value={`${poste.seguridad > 0 ? "+" : ""}${poste.seguridad}`}
-                icon={Shield}
-                trend={poste.seguridad >= 5 ? "up" : poste.seguridad >= 0 ? "neutral" : "down"}
-              />
-            </div>
-
-            <div className="flex justify-end">
-              <Button asChild size="lg">
-                <Link href={`/ops/${tokenId}/new`}>Registrar Nueva Intervención</Link>
-              </Button>
-            </div>
-
-            {/* Timeline */}
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <h2 className="text-2xl font-bold">Historial de Operaciones</h2>
-                <p className="text-sm text-muted-foreground">
-                  {events.length} {events.length === 1 ? "evento" : "eventos"}
-                </p>
-              </div>
-              <TimelineWithRefresh initialEvents={events} tokenId={tokenId} />
-            </div>
-          </div>
-        </div>
-      </div>
-    )
+    return <PosteContentClient tokenId={tokenId} initialPoste={poste} initialEvents={events} />
   } catch (error) {
     console.log("[v0] Error fetching pole data:", error)
     notFound()
