@@ -13,16 +13,18 @@ import { Alert, AlertDescription } from "@/components/ui/alert"
 import { PosteRecordReading } from "@/components/poste-record-reading"
 import { PosteRecordMaintenance } from "@/components/poste-record-maintenance"
 import { PosteRecordReplacement } from "@/components/poste-record-replacement"
+import type { Poste, PosteEvent, PosteWithSource } from "@/lib/types"
 
 interface PosteContentClientProps {
   tokenId: string
-  initialPoste: any
-  initialEvents: any[]
+  initialPoste: PosteWithSource
+  fallbackPoste?: Poste
+  initialEvents: PosteEvent[]
 }
 
-export function PosteContentClient({ tokenId, initialPoste, initialEvents }: PosteContentClientProps) {
+export function PosteContentClient({ tokenId, initialPoste, fallbackPoste, initialEvents }: PosteContentClientProps) {
   return (
-    <PosteDataProvider tokenId={tokenId} mockData={initialPoste}>
+    <PosteDataProvider tokenId={tokenId} initialPoste={initialPoste} fallbackPoste={fallbackPoste}>
       {({ poste, isFromContract, isLoading }) => (
         <div className="min-h-screen bg-background">
           <div className="container mx-auto px-4 py-8 max-w-6xl">

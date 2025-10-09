@@ -31,8 +31,16 @@ async function PosteContent({ tokenId }: { tokenId: string }) {
     const fetchDuration = Date.now() - fetchStart
     console.log("[v0] Data fetched in", fetchDuration, "ms")
     console.log("[v0] Timeline loaded with", events.length, "events")
+    console.log("[v0] Poste source", poste.source)
 
-    return <PosteContentClient tokenId={tokenId} initialPoste={poste} initialEvents={events} />
+    return (
+      <PosteContentClient
+        tokenId={tokenId}
+        initialPoste={poste}
+        fallbackPoste={poste.fallback}
+        initialEvents={events}
+      />
+    )
   } catch (error) {
     console.log("[v0] Error fetching pole data:", error)
     notFound()

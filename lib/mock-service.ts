@@ -1,4 +1,4 @@
-import type { Poste, PosteEvent } from "./types"
+import type { Poste, PosteEvent, PosteWithSource } from "./types"
 import { hashAssetTag } from "./hash-utils"
 
 async function getPostesData(): Promise<Poste[]> {
@@ -36,11 +36,55 @@ async function getEventsData(tokenId: string): Promise<PosteEvent[]> {
   return []
 }
 
-export async function getPosteByTokenId(tokenId: string): Promise<Poste> {
-  const data = await getPostesData()
-  const poste = data.find((d) => d.tokenId === tokenId)
-  if (!poste) throw new Error("Poste no encontrado")
-  return poste
+async function readContractPoste(
+  tokenId: string,
+  metadata?: {
+    assetTag?: string
+    ubicacion?: string
+    imageURI?: string
+  },
+): Promise<Poste | null> {
+  if (typeof window !== "undefined") {
+    return null
+  }
+
+  const { readPosteFromContract } = await import("./contract-reader.server")
+  return readPosteFromContract(tokenId, metadata)
+}
+
+export async function getPosteByTokenId(tokenId: string): Promise<PosteWithSource> {
+  const postes = await getPostesData()
+  const fallbackPoste = postes.find((d) => d.tokenId === tokenId)
+
+  // First, try to read from the blockchain contract using mock metadata for richer display
+  console.log(`[mock-service] Attempting to read poste ${tokenId} from contract`)
+  const contractPoste = await readContractPoste(tokenId, {
+    assetTag: fallbackPoste?.assetTag,
+    ubicacion: fallbackPoste?.ubicacion,
+    imageURI: fallbackPoste?.imageURI,
+  })
+
+  if (contractPoste) {
+    console.log(`[mock-service] Found poste ${tokenId} in contract`)
+    const result: PosteWithSource = {
+      ...contractPoste,
+      source: "contract",
+      fallback: fallbackPoste,
+    }
+    return result
+  }
+
+  // Fallback to JSON mock data
+  console.log(`[mock-service] Poste ${tokenId} not in contract, checking mock data`)
+  if (fallbackPoste) {
+    console.log(`[mock-service] Found poste ${tokenId} in mock data`)
+    return {
+      ...fallbackPoste,
+      source: "mock",
+    }
+  }
+
+  throw new Error("Poste no encontrado")
 }
 
 export async function resolveAssetTag(assetTag: string): Promise<{ tokenId: string }> {

@@ -13,6 +13,17 @@ export interface Poste {
   updatedAt: string // ISO
 }
 
+export type PosteSource = "contract" | "mock"
+
+export interface PosteWithSource extends Poste {
+  source: PosteSource
+  /**
+   * Mock/local data used as fallback when contract data is unavailable.
+   * Useful to hydrate client state with richer metadata and as an offline backup.
+   */
+  fallback?: Poste
+}
+
 export interface BaseEvent {
   id: string
   tokenId: string

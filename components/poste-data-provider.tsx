@@ -1,9 +1,9 @@
 "use client"
 
-import { useEffect, useState } from "react"
-import { useAccount } from "wagmi"
+import { useEffect, useMemo, useState } from "react"
 import { useGetPoste } from "@/hooks/use-postedor-contract"
 import { contractPosteToAppPoste } from "@/lib/contract-utils"
+import type { Poste, PosteWithSource } from "@/lib/types"
 
 interface PosteData {
   tokenId: string
@@ -19,40 +19,81 @@ interface PosteData {
 
 interface PosteDataProviderProps {
   tokenId: string
-  mockData: PosteData
+  initialPoste: PosteWithSource
+  fallbackPoste?: Poste
   children: (data: { poste: PosteData; isFromContract: boolean; isLoading: boolean }) => React.ReactNode
+}
+
+const DEFAULT_ATTESTATION = ""
+
+function toClientPoste(poste: Poste | PosteWithSource): PosteData {
+  return {
+    tokenId: poste.tokenId,
+    assetTag: poste.assetTag ?? `POSTE-${poste.tokenId}`,
+    ubicacion: poste.ubicacion,
+    capacidadKW: poste.capacidadKW,
+    consumoEntregado: poste.consumoEntregado,
+    consumoRestante: poste.consumoRestante,
+    seguridad: poste.seguridad,
+    lastAttestationUID: poste.lastAttestationUID ?? DEFAULT_ATTESTATION,
+    imageURI: poste.imageURI,
+  }
 }
 
 /**
  * Provider component that fetches poste data from contract with fallback to mock data
  */
-export function PosteDataProvider({ tokenId, mockData, children }: PosteDataProviderProps) {
-  const { isConnected } = useAccount()
-  const [posteData, setPosteData] = useState<PosteData>(mockData)
-  const [isFromContract, setIsFromContract] = useState(false)
+export function PosteDataProvider({ tokenId, initialPoste, fallbackPoste, children }: PosteDataProviderProps) {
+  const fallback = fallbackPoste ?? initialPoste
+  const fallbackClient = useMemo(() => toClientPoste(fallback), [fallback])
 
-  const {
-    data: contractData,
-    isLoading,
-    isSuccess,
-  } = useGetPoste(isConnected ? BigInt(tokenId) : undefined)
+  const [posteData, setPosteData] = useState<PosteData>(() => toClientPoste(initialPoste))
+  const [isFromContract, setIsFromContract] = useState(initialPoste.source === "contract")
 
   useEffect(() => {
-    if (isSuccess && contractData && isConnected) {
-      // Convert contract data to app format
-      const convertedData = contractPosteToAppPoste(BigInt(tokenId), contractData, {
-        assetTag: mockData.assetTag, // Keep original metadata
-        ubicacion: mockData.ubicacion,
-        imageURI: mockData.imageURI,
-      })
+    setPosteData(toClientPoste(initialPoste))
+    setIsFromContract(initialPoste.source === "contract")
+  }, [initialPoste])
+
+  const metadata = useMemo(
+    () => ({
+      assetTag: fallback.assetTag,
+      ubicacion: fallback.ubicacion,
+      imageURI: fallback.imageURI,
+    }),
+    [fallback],
+  )
+
+  const tokenAsBigInt = useMemo(() => {
+    try {
+      return BigInt(tokenId)
+    } catch (error) {
+      console.warn("[PosteDataProvider] Invalid tokenId provided", { tokenId, error })
+      return undefined
+    }
+  }, [tokenId])
+
+  const { data: contractData, isLoading, isSuccess, isError } = useGetPoste(tokenAsBigInt)
+
+  useEffect(() => {
+    if (!tokenAsBigInt) {
+      setPosteData(fallbackClient)
+      setIsFromContract(false)
+      return
+    }
+
+    if (isSuccess && contractData) {
+      const convertedData = contractPosteToAppPoste(tokenAsBigInt, contractData, metadata)
       setPosteData(convertedData)
       setIsFromContract(true)
-    } else {
-      // Use mock data when not connected or no contract data
-      setPosteData(mockData)
+      return
+    }
+
+    if (!isLoading && (isError || !contractData)) {
+      setPosteData(fallbackClient)
       setIsFromContract(false)
     }
-  }, [contractData, isSuccess, isConnected, tokenId, mockData])
+  }, [tokenAsBigInt, contractData, isSuccess, isLoading, isError, metadata, fallbackClient])
 
-  return <>{children({ poste: posteData, isFromContract, isLoading: isConnected && isLoading })}</>
+  return <>{children({ poste: posteData, isFromContract, isLoading })}</>
 }

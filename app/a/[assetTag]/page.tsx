@@ -1,63 +1,36 @@
-"use client"
-
-import { useEffect, useState } from "react"
-import { useRouter } from "next/navigation"
+import { redirect } from "next/navigation"
 import { resolveAssetTag } from "@/lib/mock-service"
-import { Loader2 } from "lucide-react"
 
 interface PageProps {
   params: Promise<{ assetTag: string }>
 }
 
-export default function AssetTagPage({ params }: PageProps) {
-  const router = useRouter()
-  const [assetTag, setAssetTag] = useState<string>("")
+export default async function AssetTagPage({ params }: PageProps) {
+  const startTime = Date.now()
+  const { assetTag } = await params
 
-  useEffect(() => {
-    params.then((p) => setAssetTag(p.assetTag))
-  }, [params])
+  console.log("[v0:telemetry] Asset tag lookup started", { assetTag })
 
-  useEffect(() => {
-    if (!assetTag) return
+  try {
+    const { tokenId } = await resolveAssetTag(assetTag)
+    const duration = Date.now() - startTime
 
-    const resolveTag = async () => {
-      const startTime = performance.now()
-      console.log("[v0:telemetry] Asset tag lookup started", { assetTag })
+    console.log("[v0:telemetry] Asset tag resolved successfully", {
+      assetTag,
+      tokenId,
+      duration: `${duration}ms`,
+    })
 
-      try {
-        const { tokenId } = await resolveAssetTag(assetTag)
-        const duration = performance.now() - startTime
+    redirect(`/p/${tokenId}`)
+  } catch (error) {
+    const duration = Date.now() - startTime
 
-        console.log("[v0:telemetry] Asset tag resolved successfully", {
-          assetTag,
-          tokenId,
-          duration: `${duration.toFixed(2)}ms`,
-        })
+    console.log("[v0:telemetry] Asset tag lookup failed", {
+      assetTag,
+      error: error instanceof Error ? error.message : "Unknown error",
+      duration: `${duration}ms`,
+    })
 
-        await new Promise((resolve) => setTimeout(resolve, 500))
-        router.push(`/p/${tokenId}`)
-      } catch (error) {
-        const duration = performance.now() - startTime
-
-        console.log("[v0:telemetry] Asset tag lookup failed", {
-          assetTag,
-          error: error instanceof Error ? error.message : "Unknown error",
-          duration: `${duration.toFixed(2)}ms`,
-        })
-
-        router.push("/?error=not-found")
-      }
-    }
-
-    resolveTag()
-  }, [assetTag, router])
-
-  return (
-    <div className="flex min-h-screen items-center justify-center bg-background">
-      <div className="flex flex-col items-center gap-4">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
-        <p className="text-sm text-muted-foreground">Resolviendo asset tag...</p>
-      </div>
-    </div>
-  )
+    redirect("/?error=not-found")
+  }
 }

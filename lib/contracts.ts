@@ -5,7 +5,7 @@
  */
 
 import PostedorABI from "@/jsons/PostedorNFT.abi.json"
-import { polkadotAssetHubTestnet } from "./wagmi"
+import { polkadotAssetHubTestnet } from "./chains"
 
 export const POSTEDOR_ABI = PostedorABI as const
 
