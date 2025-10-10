@@ -46,7 +46,7 @@ async function PosteContent({ assetTag }: { assetTag: string }) {
 function LoadingSkeleton() {
   return (
     <div className="min-h-screen bg-background">
-      <div className="container mx-auto px-4 py-8 max-w-6xl">
+      <div className="page-shell py-8">
         <div className="space-y-8">
           <Card className="h-80 animate-pulse bg-muted" />
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">

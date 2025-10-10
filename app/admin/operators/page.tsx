@@ -152,7 +152,7 @@ export default function OperatorsPage() {
 
   if (loading) {
     return (
-      <div className="container mx-auto p-6 max-w-7xl">
+      <div className="page-shell max-w-7xl py-6">
         <div className="animate-pulse space-y-4">
           <div className="h-8 bg-muted rounded w-1/4" />
           <div className="h-64 bg-muted rounded" />
@@ -162,7 +162,7 @@ export default function OperatorsPage() {
   }
 
   return (
-    <div className="container mx-auto p-6 max-w-7xl space-y-6">
+    <div className="page-shell max-w-7xl space-y-6 py-6">
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold">Gestión de Operadores</h1>

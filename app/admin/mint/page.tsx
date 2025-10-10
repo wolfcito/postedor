@@ -313,7 +313,7 @@ export default function MintPolePage() {
   // Success view
   if (mintedPoste) {
     return (
-      <div className="container mx-auto max-w-4xl space-y-6 p-4 py-8">
+      <div className="page-shell max-w-4xl space-y-6 py-8">
         <div className="flex items-center gap-4">
           <Link href="/">
             <Button variant="ghost" size="icon">
@@ -376,7 +376,7 @@ export default function MintPolePage() {
   }
 
   return (
-    <div className="container mx-auto max-w-6xl space-y-6 p-4 py-8">
+    <div className="page-shell max-w-6xl space-y-6 py-8">
       <div className="flex items-center gap-4">
         <Link href="/">
           <Button variant="ghost" size="icon">

@@ -32,7 +32,7 @@ export default function CacheMetricsPage() {
   const hitRate = ((metrics.hits / (metrics.hits + metrics.misses || 1)) * 100).toFixed(1)
 
   return (
-    <div className="container mx-auto p-6 max-w-4xl">
+    <div className="page-shell max-w-4xl py-6">
       <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="text-3xl font-bold">Métricas de Caché</h1>

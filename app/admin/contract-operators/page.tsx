@@ -52,7 +52,7 @@ export default function ContractOperatorsPage() {
   // Handle success
   if (isConfirmed && hash) {
     return (
-      <div className="container mx-auto max-w-4xl space-y-6 p-4 py-8">
+      <div className="page-shell max-w-4xl space-y-6 py-8">
         <div className="flex items-center gap-4">
           <Link href="/">
             <Button variant="ghost" size="icon">
@@ -110,7 +110,7 @@ export default function ContractOperatorsPage() {
   }
 
   return (
-    <div className="container mx-auto max-w-4xl space-y-6 p-4 py-8">
+    <div className="page-shell max-w-4xl space-y-6 py-8">
       <div className="flex items-center gap-4">
         <Link href="/">
           <Button variant="ghost" size="icon">

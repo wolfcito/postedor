@@ -24,7 +24,7 @@ export default async function AdminInventoryPage() {
   const discrepancyCount = inventory.filter((item) => item.discrepancy).length
 
   return (
-    <div className="container mx-auto max-w-6xl space-y-8 p-4 py-8">
+    <div className="page-shell space-y-8 py-8">
       <div className="flex items-center gap-4">
         <Link href="/">
           <Button variant="ghost" size="icon">

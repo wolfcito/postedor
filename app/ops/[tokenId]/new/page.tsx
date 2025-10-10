@@ -20,7 +20,7 @@ async function InterventionContent({ tokenId }: { tokenId: string }) {
 
     return (
       <div className="min-h-screen bg-background">
-        <div className="container mx-auto px-4 py-8 max-w-2xl">
+        <div className="page-shell max-w-2xl py-8">
           <div className="space-y-6">
             {/* Header */}
             <div className="flex items-center gap-4">
@@ -61,7 +61,7 @@ async function InterventionContent({ tokenId }: { tokenId: string }) {
 function LoadingSkeleton() {
   return (
     <div className="min-h-screen bg-background">
-      <div className="container mx-auto px-4 py-8 max-w-2xl">
+      <div className="page-shell max-w-2xl py-8">
         <div className="space-y-6">
           <div className="flex items-center gap-4">
             <div className="h-10 w-10 rounded-md bg-muted animate-pulse" />

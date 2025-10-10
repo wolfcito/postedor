@@ -74,7 +74,7 @@ export function HomeContent() {
   }
 
   return (
-    <div className="min-h-screen bg-black relative overflow-hidden">
+    <div className="relative overflow-hidden bg-black min-h-screen">
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="stars-container">
           {stars.map((star, i) => (
@@ -92,7 +92,7 @@ export function HomeContent() {
         </div>
       </div>
 
-      <div className="container mx-auto px-4 py-16 max-w-6xl relative z-10">
+      <div className="page-shell py-16 relative z-10">
         <div className="text-center mb-20">
           <div className="flex justify-center mb-8">
           <div className="relative w-32 h-32">
@@ -180,67 +180,7 @@ export function HomeContent() {
           </div>
         </section>
 
-        <footer className="mt-32 pt-16 border-t border-zinc-800">
-          <div className="grid md:grid-cols-4 gap-12 mb-12">
-            <div>
-              <div className="flex items-center gap-2 mb-4">
-                <Zap className="w-6 h-6 text-white" />
-                <span className="font-bold text-white text-lg">Postedor</span>
-              </div>
-              <p className="text-sm text-zinc-500">© 2025 Postedor. All Rights Reserved.</p>
-            </div>
-            <div>
-              <h3 className="font-semibold text-white mb-4">Navegación</h3>
-              <ul className="space-y-2 text-sm text-zinc-400">
-                <li>
-                  <Link href="/" className="hover:text-white transition-colors">
-                    Inicio
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/reports" className="hover:text-white transition-colors">
-                    Reportes
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/admin/inventory" className="hover:text-white transition-colors">
-                    Inventario
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/admin/mint" className="hover:text-white transition-colors">
-                    Admin
-                  </Link>
-                </li>
-              </ul>
-            </div>
-            <div>
-              <h3 className="font-semibold text-white mb-4">Información</h3>
-              <ul className="space-y-2 text-sm text-zinc-400">
-                <li>
-                  <a href="#" className="hover:text-white transition-colors">
-                    Documentación
-                  </a>
-                </li>
-                <li>
-                  <a href="#" className="hover:text-white transition-colors">
-                    API Reference
-                  </a>
-                </li>
-              </ul>
-            </div>
-            <div>
-              <h3 className="font-semibold text-white mb-4">Sociales</h3>
-              <ul className="space-y-2 text-sm text-zinc-400">
-                <li>
-                  <a href="https://github.com" className="hover:text-white transition-colors">
-                    GitHub
-                  </a>
-                </li>
-              </ul>
-            </div>
-          </div>
-        </footer>
+        {/* Footer global renderizado desde RootLayout */}
       </div>
 
       <style jsx>{`

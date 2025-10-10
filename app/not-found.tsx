@@ -8,7 +8,7 @@ import { Card, CardContent } from "@/components/ui/card"
 export default function NotFound() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-background via-background/95 to-background flex items-center">
-      <div className="container mx-auto px-4 py-16 max-w-4xl">
+      <div className="page-shell max-w-4xl py-16">
         <Card className="border-border/60 bg-card/80 backdrop-blur">
           <CardContent className="p-10 space-y-8">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6">

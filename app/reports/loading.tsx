@@ -1,6 +1,6 @@
 export default function ReportsLoading() {
   return (
-    <div className="container mx-auto p-4 md:p-8">
+    <div className="page-shell py-8">
       <div className="mb-8">
         <div className="h-9 w-64 bg-muted animate-pulse rounded mb-2" />
         <div className="h-5 w-96 bg-muted animate-pulse rounded" />

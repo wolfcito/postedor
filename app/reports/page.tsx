@@ -56,7 +56,7 @@ export default function ReportsPage() {
 
   if (loading && !kpis) {
     return (
-      <div className="container mx-auto p-4 md:p-8">
+      <div className="page-shell py-8">
         <div className="mb-8">
           <h1 className="text-3xl font-bold mb-2">Reportes Ejecutivos</h1>
           <p className="text-muted-foreground">Análisis de KPIs y puntos críticos de la flota</p>
@@ -75,7 +75,7 @@ export default function ReportsPage() {
 
   if (error) {
     return (
-      <div className="container mx-auto p-4 md:p-8">
+      <div className="page-shell py-8">
         <div className="mb-8">
           <h1 className="text-3xl font-bold mb-2">Reportes Ejecutivos</h1>
           <p className="text-muted-foreground">Análisis de KPIs y puntos críticos de la flota</p>
@@ -98,7 +98,7 @@ export default function ReportsPage() {
   const isEmpty = kpis.totalPoles === 0
 
   return (
-    <div className="container mx-auto p-4 md:p-8">
+    <div className="page-shell py-8">
       {/* Header */}
       <div className="mb-8">
         <div className="flex items-center justify-between mb-2">
