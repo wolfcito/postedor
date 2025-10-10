@@ -45,7 +45,7 @@ export default function TransactionsPage() {
 
   const exportTransactions = () => {
     const csv = [
-      ["Hash", "Type", "Status", "Operation", "Block", "Confirmations", "Gas Cost", "Timestamp"].join(","),
+      ["Hash", "Type", "Status", "Operation", "Block", "Confirmations", "Gas Cost (PAS)", "Timestamp"].join(","),
       ...transactions.map((tx) =>
         [
           tx.hash,
@@ -178,7 +178,7 @@ export default function TransactionsPage() {
                       </span>
                       {tx.gasCost && (
                         <span>
-                          <span className="text-muted-foreground">Gas:</span> {tx.gasCost} ETH
+                          <span className="text-muted-foreground">Gas:</span> {tx.gasCost} PAS
                         </span>
                       )}
                     </div>

@@ -25,7 +25,7 @@ export interface GasEstimate {
   gasPrice: string
   maxFeePerGas: string
   maxPriorityFeePerGas: string
-  estimatedCost: string // in ETH
+  estimatedCost: string // in PAS
   estimatedCostUSD: string
 }
 
@@ -57,15 +57,15 @@ export async function estimateGas(operation: "mint" | "intervention"): Promise<G
   const maxPriorityFeePerGas = (2 + Math.random() * 3).toFixed(2)
 
   const estimatedCostWei = Number.parseInt(gasLimit) * Number.parseFloat(gasPrice) * 1e9
-  const estimatedCostETH = (estimatedCostWei / 1e18).toFixed(6)
-  const ethPriceUSD = 2500 + Math.random() * 500 // Mock ETH price
-  const estimatedCostUSD = (Number.parseFloat(estimatedCostETH) * ethPriceUSD).toFixed(2)
+  const estimatedCostPAS = (estimatedCostWei / 1e18).toFixed(6)
+  const pasPriceUSD = 1.5 + Math.random() * 0.5 // Mock PAS price in USD
+  const estimatedCostUSD = (Number.parseFloat(estimatedCostPAS) * pasPriceUSD).toFixed(2)
 
   console.log("[v0] Gas estimation:", {
     operation,
     gasLimit,
     gasPrice: `${gasPrice} Gwei`,
-    estimatedCost: `${estimatedCostETH} ETH ($${estimatedCostUSD})`,
+    estimatedCost: `${estimatedCostPAS} PAS ($${estimatedCostUSD})`,
   })
 
   return {
@@ -73,7 +73,7 @@ export async function estimateGas(operation: "mint" | "intervention"): Promise<G
     gasPrice,
     maxFeePerGas,
     maxPriorityFeePerGas,
-    estimatedCost: estimatedCostETH,
+    estimatedCost: estimatedCostPAS,
     estimatedCostUSD,
   }
 }
@@ -202,5 +202,5 @@ export async function waitForTransaction(txHash: string, confirmations = 1): Pro
  * Get mock explorer URL for transaction
  */
 export function getExplorerUrl(txHash: string): string {
-  return `https://mock-explorer.example.com/tx/${txHash}`
+  return `https://blockscout-passet-hub.parity-testnet.parity.io/tx/${txHash}`
 }

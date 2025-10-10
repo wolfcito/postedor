@@ -1,8 +1,8 @@
 import { randomBytes } from "crypto"
 
 /**
- * Generates a mock attestation UID in the format used by EAS (Ethereum Attestation Service)
- * Format: 0x + 64 hex characters
+ * Generates a mock attestation UID inspired by el formato de Polkadot Asset Hub / EAS
+ * Formato: 0x + 64 caracteres hexadecimales
  */
 export function generateMockAttestationUID(): string {
   const bytes = randomBytes(32)

@@ -100,7 +100,7 @@ export function TransactionStatusTracker({ transaction, onComplete }: Transactio
 
         <Button variant="outline" size="sm" className="w-full bg-transparent" asChild>
           <a href={getExplorerUrl(tx.hash)} target="_blank" rel="noopener noreferrer">
-            Ver en Explorer
+            Ver en Blockscout
             <ExternalLink className="ml-2 h-3 w-3" />
           </a>
         </Button>

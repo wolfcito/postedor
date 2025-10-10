@@ -26,7 +26,7 @@ export default function ContractOperatorsPage() {
     if (!operatorAddress || !/^0x[a-fA-F0-9]{40}$/.test(operatorAddress)) {
       toast({
         title: "Dirección inválida",
-        description: "Ingresa una dirección Ethereum válida",
+        description: "Ingresa una dirección válida en formato 0x...",
         variant: "destructive",
       })
       return
@@ -173,7 +173,7 @@ export default function ContractOperatorsPage() {
                   onChange={(e) => setOperatorAddress(e.target.value)}
                 />
                 <p className="text-xs text-muted-foreground">
-                  Ingresa la dirección Ethereum que quieres habilitar/deshabilitar como operator
+                  Ingresa la dirección en PolkaVM (formato 0x...) que quieres habilitar/deshabilitar como operator
                 </p>
                 <Button
                   variant="outline"

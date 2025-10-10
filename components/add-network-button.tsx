@@ -17,7 +17,7 @@ export function AddNetworkButton({ variant = "outline", size = "sm" }: AddNetwor
       if (typeof window.ethereum === "undefined") {
         toast({
           title: "Wallet no detectada",
-          description: "Por favor instala MetaMask u otra wallet compatible",
+          description: "Por favor instala una wallet compatible con PolkaVM (MetaMask, Talisman, etc.)",
           variant: "destructive",
         })
         return
@@ -65,7 +65,7 @@ export function AddNetworkButton({ variant = "outline", size = "sm" }: AddNetwor
       if (typeof window.ethereum === "undefined") {
         toast({
           title: "Wallet no detectada",
-          description: "Por favor instala MetaMask u otra wallet compatible",
+          description: "Por favor instala una wallet compatible con PolkaVM (MetaMask, Talisman, etc.)",
           variant: "destructive",
         })
         return

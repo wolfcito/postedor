@@ -38,7 +38,7 @@ export default async function TransactionPage({ params }: PageProps) {
             <div className="bg-muted/50 p-4 rounded-lg">
               <p className="text-muted-foreground mb-2">Este es un explorador simulado de transacciones.</p>
               <p className="text-muted-foreground">
-                En producción, esto enlazaría a un explorador blockchain real (ej: Etherscan, Basescan).
+                En producción, esto enlazaría a un explorador blockchain real como Blockscout para Polkadot Asset Hub.
               </p>
             </div>
 

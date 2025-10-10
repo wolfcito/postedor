@@ -113,7 +113,7 @@ export function TransactionPreviewDialog({
                 <div className="flex justify-between">
                   <span className="text-sm font-medium">Costo Estimado:</span>
                   <div className="text-right">
-                    <div className="font-mono text-sm">{gasEstimate.estimatedCost} ETH</div>
+                    <div className="font-mono text-sm">{gasEstimate.estimatedCost} PAS</div>
                     <div className="text-xs text-muted-foreground">${gasEstimate.estimatedCostUSD} USD</div>
                   </div>
                 </div>
