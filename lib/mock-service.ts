@@ -1,5 +1,6 @@
 import type { Poste, PosteEvent, PosteWithSource } from "./types"
 import { hashAssetTag } from "./hash-utils"
+import { STATIC_POSTES } from "./static-postes"
 
 async function getPostesData(): Promise<Poste[]> {
   // En servidor, usar filesystem para evitar fetch a localhost durante build
@@ -23,7 +24,7 @@ async function getPostesData(): Promise<Poste[]> {
           console.warn("Error fetching postes data from remote URL:", remoteError)
         }
       }
-      return []
+      return STATIC_POSTES
     }
   }
 
