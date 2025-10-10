@@ -11,8 +11,19 @@ async function getPostesData(): Promise<Poste[]> {
       const fileContent = await fs.readFile(filePath, "utf-8")
       return JSON.parse(fileContent)
     } catch (error) {
-      console.error("Error reading postes.json from filesystem:", error)
-      throw new Error("Failed to load postes data")
+      console.warn("Error reading postes.json from filesystem, returning empty dataset:", error)
+      const dataUrl = process.env.POSTEDOR_POSTES_DATA_URL ?? process.env.NEXT_PUBLIC_POSTES_DATA_URL
+      if (dataUrl) {
+        try {
+          const response = await fetch(dataUrl, { cache: "no-store" })
+          if (response.ok) {
+            return response.json()
+          }
+        } catch (remoteError) {
+          console.warn("Error fetching postes data from remote URL:", remoteError)
+        }
+      }
+      return []
     }
   }
 
