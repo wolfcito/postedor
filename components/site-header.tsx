@@ -1,12 +1,16 @@
 import Link from "next/link"
-import { Zap } from "lucide-react"
-import { Button } from "@/components/ui/button"
+import { Zap, ChevronDown } from "lucide-react"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 
 const primaryNav = [
   { href: "/", label: "Inicio" },
   { href: "/reports", label: "Reportes" },
   { href: "/admin/inventory", label: "Inventario" },
-  { href: "/admin/mint", label: "Minteo" },
 ]
 
 export function SiteHeader() {
@@ -29,9 +33,20 @@ export function SiteHeader() {
               {item.label}
             </Link>
           ))}
-          <Button asChild size="sm" className="hidden md:inline-flex">
-            <Link href="/admin/mint">Registrar poste</Link>
-          </Button>
+          <DropdownMenu>
+            <DropdownMenuTrigger className="inline-flex items-center gap-2 rounded-md px-3 py-2 transition hover:bg-muted hover:text-foreground focus-visible:outline-none">
+              Admin
+              <ChevronDown className="h-4 w-4" />
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" sideOffset={8} className="min-w-[12rem]">
+              <DropdownMenuItem asChild>
+                <Link href="/admin/mint">Registrar poste</Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link href="/admin/contract-operators">Agregar operadores</Link>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </nav>
       </div>
     </header>
