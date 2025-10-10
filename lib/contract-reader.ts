@@ -31,6 +31,52 @@ const publicClient = createPublicClient({
   transport: http(),
 })
 
+function isPrunedStateError(error: any): boolean {
+  const message = error?.cause?.message ?? error?.message ?? ""
+  return (
+    message.includes("state already discarded") ||
+    message.includes("UnknownBlock") ||
+    message.includes("AncientBlock") ||
+    message.includes("header not found")
+  )
+}
+
+async function readContractSafely<T>({
+  address,
+  functionName,
+  args,
+  blockNumber,
+}: {
+  address: `0x${string}`
+  functionName: string
+  args: readonly unknown[]
+  blockNumber?: bigint
+}): Promise<T> {
+  try {
+    return await publicClient.readContract({
+      address,
+      abi: POSTEDOR_ABI,
+      functionName,
+      args,
+      blockNumber,
+    })
+  } catch (error) {
+    if (blockNumber && isPrunedStateError(error)) {
+      console.warn(
+        `[contract-reader] Historical state unavailable for ${functionName} at block ${blockNumber}. Falling back to latest.`,
+        error,
+      )
+      return publicClient.readContract({
+        address,
+        abi: POSTEDOR_ABI,
+        functionName,
+        args,
+      })
+    }
+    throw error
+  }
+}
+
 /**
  * Read poste data from the blockchain contract
  */
@@ -51,9 +97,8 @@ export async function readPosteFromContract(
     console.log(`[contract-reader] Reading poste ${tokenId} from contract ${contractAddress}`)
 
     // Check if token exists by trying to get owner
-    const owner = await publicClient.readContract({
+    const owner = await readContractSafely<`0x${string}`>({
       address: contractAddress,
-      abi: POSTEDOR_ABI,
       functionName: "ownerOf",
       args: [tokenAsBigInt],
       blockNumber: options?.blockNumber,
@@ -65,9 +110,8 @@ export async function readPosteFromContract(
     }
 
     // Get poste data from contract
-    const posteData = await publicClient.readContract({
+    const posteData = await readContractSafely({
       address: contractAddress,
-      abi: POSTEDOR_ABI,
       functionName: "getPoste",
       args: [tokenAsBigInt],
       blockNumber: options?.blockNumber,
@@ -226,6 +270,7 @@ export async function getPosteSnapshotsFromContract(
     logIndex?: number
   }>
 
+  const seenKeys = new Set<string>()
   try {
     logs = await publicClient.getLogs({
       address: contractAddress,
@@ -247,18 +292,33 @@ export async function getPosteSnapshotsFromContract(
       continue
     }
 
-    try {
-      const [block, receipt, poste] = await Promise.all([
-        publicClient.getBlock({ blockNumber: log.blockNumber }),
-        publicClient.getTransactionReceipt({ hash: log.transactionHash }),
-        readPosteFromContract(tokenId, metadata, { blockNumber: log.blockNumber }),
-      ])
+    const dedupKey = `${log.transactionHash}-${log.logIndex ?? "0"}-${log.blockNumber.toString()}`
+    if (seenKeys.has(dedupKey)) {
+      continue
+    }
+    seenKeys.add(dedupKey)
 
+    try {
+      const block = await publicClient
+        .getBlock({ blockNumber: log.blockNumber })
+        .catch((error) => {
+          console.warn("[contract-reader] Unable to load block metadata, using latest timestamp instead:", error)
+          return publicClient.getBlock({ blockTag: "latest" })
+        })
+
+      const receipt = await publicClient
+        .getTransactionReceipt({ hash: log.transactionHash })
+        .catch((error) => {
+          console.warn("[contract-reader] Transaction receipt unavailable:", error)
+          return null
+        })
+
+      const poste = await readPosteFromContract(tokenId, metadata, { blockNumber: log.blockNumber })
       if (!poste) {
         continue
       }
 
-      const timestamp = new Date(Number(block.timestamp) * 1000).toISOString()
+      const timestamp = block?.timestamp ? new Date(Number(block.timestamp) * 1000).toISOString() : new Date().toISOString()
 
       const enrichedPoste: Poste = {
         ...poste,

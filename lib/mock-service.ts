@@ -142,17 +142,25 @@ export async function getEventsByTokenId(tokenId: string, metadata?: PosteMetada
           count: snapshots.length,
         })
 
-        contractEvents = snapshots.map((snapshot) => ({
-          id: `${snapshot.transactionHash}-${snapshot.logIndex}`,
-          tokenId: snapshot.tokenId,
-          type: "READING",
-          actor: snapshot.actor ?? "Operador desconocido",
-          attestationUID: snapshot.poste.lastAttestationUID ?? "",
-          txHash: snapshot.transactionHash,
-          ts: snapshot.timestamp,
-          deliveredKWh: snapshot.poste.consumoEntregado,
-          remainingKWh: snapshot.poste.consumoRestante,
-        }))
+        const seenIds = new Set<string>()
+        contractEvents = snapshots.map((snapshot) => {
+          const id = `${snapshot.transactionHash}-${snapshot.logIndex}`
+          if (seenIds.has(id)) {
+            return null
+          }
+          seenIds.add(id)
+          return {
+            id,
+            tokenId: snapshot.tokenId,
+            type: "READING",
+            actor: snapshot.actor ?? "Operador desconocido",
+            attestationUID: snapshot.poste.lastAttestationUID ?? "",
+            txHash: snapshot.transactionHash,
+            ts: snapshot.timestamp,
+            deliveredKWh: snapshot.poste.consumoEntregado,
+            remainingKWh: snapshot.poste.consumoRestante,
+          } satisfies PosteEvent
+        }).filter((event): event is PosteEvent => Boolean(event))
       }
     } catch (error) {
       console.error("[mock-service] Error loading events from contract:", error)

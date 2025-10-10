@@ -11,7 +11,8 @@ export const POSTEDOR_ABI = PostedorABI as const
 
 // Contract addresses - update these with your deployed contract addresses
 export const CONTRACT_ADDRESSES = {
-  POSTEDOR: process.env.NEXT_PUBLIC_POSTEDOR_CONTRACT_ADDRESS,
+  POSTEDOR: (process.env.POSTEDOR_CONTRACT_ADDRESS ??
+    process.env.NEXT_PUBLIC_POSTEDOR_CONTRACT_ADDRESS) as `0x${string}` | undefined,
 } as const
 
 // Contract configuration object for easy access
