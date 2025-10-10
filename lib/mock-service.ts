@@ -16,7 +16,9 @@ async function getPostesData(): Promise<Poste[]> {
       const dataUrl = process.env.POSTEDOR_POSTES_DATA_URL ?? process.env.NEXT_PUBLIC_POSTES_DATA_URL
       if (dataUrl) {
         try {
-          const response = await fetch(dataUrl, { cache: "no-store" })
+          const response = await fetch(dataUrl, {
+            next: { revalidate: 60 },
+          })
           if (response.ok) {
             return response.json()
           }
@@ -75,32 +77,61 @@ function mergeMetadata(primary?: PosteMetadataInput, fallback?: PosteMetadataInp
   }
 }
 
-export async function getPosteByTokenId(tokenId: string, metadata?: PosteMetadataInput): Promise<PosteWithSource> {
-  const postes = await getPostesData()
-  const fallbackPoste = postes.find((d) => d.tokenId === tokenId)
-  const mergedMetadata = mergeMetadata(metadata, fallbackPoste)
+async function findFallbackPoste(tokenId: string, assetTag?: string): Promise<Poste | undefined> {
+  try {
+    const postes = await getPostesData()
+    const byToken = postes.find((d) => d.tokenId === tokenId)
+    if (byToken) return byToken
+    if (assetTag) {
+      return postes.find((d) => d.assetTag === assetTag)
+    }
+  } catch (error) {
+    console.warn("[mock-service] Unable to load fallback postes:", error)
+  }
+  return undefined
+}
 
-  // First, try to read from the blockchain contract using mock metadata for richer display
+export async function getPosteByTokenId(tokenId: string, metadata?: PosteMetadataInput): Promise<PosteWithSource> {
+  let fallbackLoaded = false
+  let cachedFallback: Poste | undefined
+
+  const ensureFallback = async () => {
+    if (!fallbackLoaded) {
+      cachedFallback = await findFallbackPoste(tokenId, metadata?.assetTag)
+      fallbackLoaded = true
+    }
+    return cachedFallback
+  }
+
+  const metadataForContract =
+    metadata && metadata.assetTag && metadata.ubicacion && metadata.imageURI
+      ? metadata
+      : mergeMetadata(metadata, await ensureFallback())
+
+  // First, try to read from the blockchain contract using metadata if available
   console.log(`[mock-service] Attempting to read poste ${tokenId} from contract`)
-  const contractPoste = await readContractPoste(tokenId, mergedMetadata)
+  const contractPoste = await readContractPoste(tokenId, metadataForContract)
 
   if (contractPoste) {
     console.log(`[mock-service] Found poste ${tokenId} in contract`)
-    const result: PosteWithSource = {
+    const fallbackPoste = await ensureFallback()
+    const mergedMetadata = mergeMetadata(metadataForContract, fallbackPoste)
+    return {
       ...contractPoste,
+      ...mergedMetadata,
       source: "contract",
       fallback: fallbackPoste,
     }
-    return result
   }
 
-  // Fallback to JSON mock data
+  // Fallback to JSON/mock data when contract has no record
   console.log(`[mock-service] Poste ${tokenId} not in contract, checking mock data`)
+  const fallbackPoste = await ensureFallback()
   if (fallbackPoste) {
     console.log(`[mock-service] Found poste ${tokenId} in mock data`)
     return {
       ...fallbackPoste,
-      ...mergedMetadata,
+      ...mergeMetadata(metadata, fallbackPoste),
       source: "mock",
     }
   }
@@ -110,6 +141,9 @@ export async function getPosteByTokenId(tokenId: string, metadata?: PosteMetadat
 
 export async function resolveAssetTag(assetTag: string): Promise<{ tokenId: string }> {
   const normalized = assetTag.trim()
+  if (/^\d+$/.test(normalized)) {
+    return { tokenId: normalized }
+  }
   const hash = hashAssetTag(normalized)
   console.log("[v0:mock] Asset tag hashed", { assetTag: normalized, hash })
 

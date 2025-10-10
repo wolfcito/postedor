@@ -4,20 +4,7 @@ import { getPosteByTokenId, getEventsByTokenId, resolveAssetTag } from "@/lib/mo
 import { Card } from "@/components/ui/card"
 import { PosteContentClient } from "@/components/poste-content-client"
 
-export const revalidate = 60
-
-export async function generateStaticParams() {
-  try {
-    const fs = await import("fs/promises")
-    const path = await import("path")
-    const filePath = path.join(process.cwd(), "public", "mocks", "postes.json")
-    const fileContent = await fs.readFile(filePath, "utf-8")
-    const postes = JSON.parse(fileContent) as Array<{ assetTag: string }>
-    return postes.slice(0, 10).map((poste) => ({ assetTag: poste.assetTag }))
-  } catch {
-    return []
-  }
-}
+export const dynamic = "force-dynamic"
 
 interface PageProps {
   params: Promise<{ assetTag: string }>
@@ -30,7 +17,7 @@ async function PosteContent({ assetTag }: { assetTag: string }) {
   try {
     const { tokenId } = await resolveAssetTag(assetTag)
 
-    const metadata = { assetTag }
+    const metadata = /^\d+$/.test(assetTag) ? undefined : { assetTag }
 
     const [poste, events] = await Promise.all([
       getPosteByTokenId(tokenId, metadata),
