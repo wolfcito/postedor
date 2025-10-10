@@ -6,6 +6,8 @@ import { Analytics } from "@vercel/analytics/next"
 import { Suspense } from "react"
 import { Toaster } from "@/components/ui/toaster"
 import { Providers } from "@/components/providers"
+import { SiteHeader } from "@/components/site-header"
+import { SiteFooter } from "@/components/site-footer"
 import "./globals.css"
 
 export const metadata: Metadata = {
@@ -23,7 +25,13 @@ export default function RootLayout({
     <html lang="es" className="dark">
       <body className={`font-sans ${GeistSans.variable} ${GeistMono.variable} antialiased`}>
         <Providers>
-          <Suspense fallback={null}>{children}</Suspense>
+          <div className="relative flex min-h-screen flex-col bg-background text-foreground">
+            <SiteHeader />
+            <main className="flex-1">
+              <Suspense fallback={null}>{children}</Suspense>
+            </main>
+            <SiteFooter />
+          </div>
           <Toaster />
           <Analytics />
         </Providers>
