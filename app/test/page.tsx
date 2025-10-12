@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -32,6 +32,11 @@ export default function ContractOperatorsPage() {
   const [operatorFetchError, setOperatorFetchError] = useState<string | null>(null)
   const [hasFetchedOperators, setHasFetchedOperators] = useState(false)
   const [contractOwner, setContractOwner] = useState<string | null>(null)
+  const [isMounted, setIsMounted] = useState(false)
+
+  useEffect(() => {
+    setIsMounted(true)
+  }, [])
 
   const handleSetOperator = () => {
     if (!operatorAddress || !/^0x[a-fA-F0-9]{40}$/.test(operatorAddress)) {
@@ -239,7 +244,7 @@ export default function ContractOperatorsPage() {
       {/* Wallet Connection */}
       <WalletConnect />
 
-      {!isConnected ? (
+      {!isMounted || !isConnected ? (
         <Alert>
           <AlertCircle className="h-4 w-4" />
           <AlertDescription>Conecta tu wallet para gestionar operators. Debes ser el owner del contrato.</AlertDescription>

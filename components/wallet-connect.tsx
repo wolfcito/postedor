@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { useWallet } from "@/hooks/use-wallet"
 import { Card } from "@/components/ui/card"
@@ -12,8 +12,18 @@ import { AddNetworkButton } from "@/components/add-network-button"
 export function WalletConnect() {
   const { address, balance, isConnected, isConnecting, connect, disconnect, isLoadingBalance, chain, connectors, connectError } = useWallet()
   const [showDialog, setShowDialog] = useState(false)
+  const [isMounted, setIsMounted] = useState(false)
 
-  if (isConnected && address) {
+  useEffect(() => {
+    setIsMounted(true)
+  }, [])
+
+  const showConnectedView = isMounted && isConnected && Boolean(address)
+  const availableConnectors = isMounted ? connectors : []
+  const isConnectingClient = isMounted && isConnecting
+  const connectButtonLabel = isConnectingClient ? "Conectando..." : "Conectar Wallet"
+
+  if (showConnectedView) {
     return (
       <Card className="p-4 bg-zinc-900/50 border-zinc-800">
         <div className="flex items-center justify-between gap-4">
@@ -45,9 +55,9 @@ export function WalletConnect() {
 
   return (
     <>
-      <Button onClick={() => setShowDialog(true)} disabled={isConnecting} className="w-full" size="lg">
+      <Button onClick={() => setShowDialog(true)} disabled={isConnectingClient} className="w-full" size="lg">
         <Wallet className="w-4 h-4 mr-2" />
-        {isConnecting ? "Conectando..." : "Conectar Wallet"}
+        {connectButtonLabel}
       </Button>
 
       <Dialog open={showDialog} onOpenChange={setShowDialog}>
@@ -60,7 +70,7 @@ export function WalletConnect() {
           </DialogHeader>
 
           <div className="space-y-3">
-            {connectors.map((connector) => (
+            {availableConnectors.map((connector) => (
               <Button
                 key={connector.id}
                 variant="outline"
@@ -69,7 +79,7 @@ export function WalletConnect() {
                   connect(connector)
                   setShowDialog(false)
                 }}
-                disabled={isConnecting}
+                disabled={isConnectingClient}
               >
                 <div className="flex items-center gap-3">
                   <Wallet className="w-5 h-5" />
