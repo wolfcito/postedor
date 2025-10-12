@@ -11,6 +11,7 @@ const primaryNav = [
   { href: "/", label: "Inicio" },
   { href: "/reports", label: "Reportes" },
   { href: "/admin/inventory", label: "Inventario" },
+  { href: "/test", label: "Test" },
 ]
 
 export function SiteHeader() {
