@@ -42,7 +42,7 @@ export function PolePreviewCard({
       <CardContent className="space-y-4">
         {/* Image */}
         <div className="relative aspect-video w-full overflow-hidden rounded-lg bg-muted">
-          <Image src={imageURI || "/placeholder.svg"} alt={assetTag} fill className="object-cover" />
+          <Image src={imageURI || "/postedor400x400.png"} alt={assetTag} fill className="object-cover" />
         </div>
 
         {/* Asset Tag */}

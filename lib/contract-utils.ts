@@ -72,7 +72,7 @@ export function contractPosteToAppPoste(
     consumoRestante: Number(data.consumoRestante),
     seguridad: data.seguridad,
     lastAttestationUID: data.lastAttestationUID,
-    imageURI: metadata?.imageURI || "/placeholder.svg?height=400&width=400",
+    imageURI: metadata?.imageURI || "/postedor400x400.png",
   }
 }
 

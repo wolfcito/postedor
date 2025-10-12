@@ -37,7 +37,7 @@ export function PosteHeader({
     <Card className="overflow-hidden border-2">
       <div className="flex flex-col md:flex-row gap-6 p-6">
         <div className="relative w-full md:w-64 h-64 rounded-xl overflow-hidden bg-muted flex-shrink-0">
-          <Image src={imageURI || "/placeholder.svg"} alt={`Poste ${tokenId}`} fill className="object-cover" priority />
+          <Image src={imageURI || "/postedor400x400.png"} alt={`Poste ${tokenId}`} fill className="object-cover" priority />
         </div>
 
         <div className="flex-1 space-y-4">

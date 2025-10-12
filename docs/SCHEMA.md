@@ -31,7 +31,7 @@ interface Poste {
   "consumoEntregado": 89500,
   "consumoRestante": 60500,
   "seguridad": 8,
-  "imageURI": "/placeholder.svg?height=400&width=600",
+  "imageURI": "/postedor400x600.jpeg",
   "lastAttestationUID": "0xabc123...",
   "updatedAt": "2025-01-15T10:30:00Z"
 }

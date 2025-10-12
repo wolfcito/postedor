@@ -508,7 +508,7 @@ export default function MintPolePage() {
               </Label>
               <Input
                 id="imageURI"
-                placeholder="/placeholder.svg?height=400&width=400"
+                placeholder="/postedor400x400.png"
                 value={formData.imageURI}
                 onChange={(e) => handleInputChange("imageURI", e.target.value)}
                 className={errors.imageURI ? "border-red-500" : ""}
