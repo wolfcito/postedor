@@ -30,31 +30,79 @@ export async function GET() {
       functionName: "owner",
     })
 
-    const logs = await client.getLogs({
-      address: contractAddress,
-      abi: POSTEDOR_ABI,
-      eventName: "ApprovalForAll",
-      args: { owner },
-      fromBlock: 0n,
-      toBlock: "latest",
-    })
-
+    const explorerBaseUrl =
+      process.env.BLOCKSCOUT_API_URL ?? "https://blockscout-passet-hub.parity-testnet.parity.io/api"
+    const methodSelector = "0x558a7297" // setOperator(address,bool)
+    const maxPages = 5
+    const pageSize = 200
     const operatorStatus = new Map<string, OperatorLog & { approved: boolean }>()
 
-    for (const log of logs) {
-      const operator = log.args?.operator
-      const approved = log.args?.approved
+    for (let page = 1; page <= maxPages; page++) {
+      const qs = new URLSearchParams({
+        module: "account",
+        action: "txlist",
+        address: contractAddress,
+        sort: "asc",
+        page: page.toString(),
+        offset: pageSize.toString(),
+      })
 
-      if (!operator || typeof approved !== "boolean") {
-        continue
+      const txResponse = await fetch(`${explorerBaseUrl}?${qs.toString()}`, {
+        cache: "no-store",
+      })
+
+      if (!txResponse.ok) {
+        throw new Error(`Blockscout request failed with status ${txResponse.status}`)
       }
 
-      operatorStatus.set(operator.toLowerCase(), {
-        address: operator,
-        txHash: log.transactionHash,
-        blockNumber: log.blockNumber ? log.blockNumber.toString() : undefined,
-        approved,
-      })
+      const txPayload: {
+        status?: string
+        result?: Array<{
+          input: string
+          hash: string
+          timeStamp?: string
+          blockNumber?: string
+          txreceipt_status?: string
+        }>
+        message?: string
+      } = await txResponse.json()
+
+      if (txPayload.status !== "1" || !Array.isArray(txPayload.result)) {
+        break
+      }
+
+      const relevantTxs = txPayload.result.filter(
+        (tx) => tx.txreceipt_status !== "0" && typeof tx.input === "string" && tx.input.startsWith(methodSelector),
+      )
+
+      for (const tx of relevantTxs) {
+        const encoded = tx.input.slice(10) // strip 0x + 4-byte selector
+        if (encoded.length < 128) {
+          continue
+        }
+
+        const addressPart = encoded.slice(24, 64)
+        const enabledPart = encoded.slice(64, 128)
+        if (addressPart.length < 40 || enabledPart.length === 0) {
+          continue
+        }
+
+        const operatorAddress = `0x${addressPart.slice(-40)}`
+        const enabled = BigInt(`0x${enabledPart}`) === 1n
+        const operatorKey = operatorAddress.toLowerCase()
+
+        operatorStatus.set(operatorKey, {
+          address: operatorAddress,
+          txHash: tx.hash,
+          blockNumber: tx.blockNumber,
+          approved: enabled,
+        })
+      }
+
+      // If the page returned less than the requested page size, we've reached the end.
+      if (txPayload.result.length < pageSize) {
+        break
+      }
     }
 
     const operators = Array.from(operatorStatus.values())
@@ -64,6 +112,11 @@ export async function GET() {
         txHash: entry.txHash,
         blockNumber: entry.blockNumber,
       }))
+      .sort((a, b) => {
+        const aBlock = a.blockNumber ? Number(a.blockNumber) : 0
+        const bBlock = b.blockNumber ? Number(b.blockNumber) : 0
+        return bBlock - aBlock
+      })
 
     return NextResponse.json({
       owner,
