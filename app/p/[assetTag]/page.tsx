@@ -19,10 +19,21 @@ async function PosteContent({ assetTag }: { assetTag: string }) {
 
     const metadata = /^\d+$/.test(assetTag) ? undefined : { assetTag }
 
-    const [poste, events] = await Promise.all([
+    const [posteResult, eventsResult] = await Promise.allSettled([
       getPosteByTokenId(tokenId, metadata),
       getEventsByTokenId(tokenId, metadata),
     ])
+
+    if (posteResult.status === "rejected") {
+      throw posteResult.reason
+    }
+
+    const poste = posteResult.value
+    const events = eventsResult.status === "fulfilled" ? eventsResult.value : []
+
+    if (eventsResult.status === "rejected") {
+      console.warn("[v0] Events loading failed, falling back to empty timeline", eventsResult.reason)
+    }
 
     const fetchDuration = Date.now() - fetchStart
     console.log("[v0] Data fetched in", fetchDuration, "ms")

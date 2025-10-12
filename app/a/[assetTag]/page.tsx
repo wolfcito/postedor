@@ -12,18 +12,7 @@ export default async function AssetTagPage({ params }: PageProps) {
 
   console.log("[v0:telemetry] Asset tag lookup started", { assetTag: normalized })
 
-  try {
-    const { tokenId } = await resolveAssetTag(normalized)
-    const duration = Date.now() - startTime
-
-    console.log("[v0:telemetry] Asset tag resolved successfully", {
-      assetTag: normalized,
-      tokenId,
-      duration: `${duration}ms`,
-    })
-
-    redirect(`/p/${normalized}`)
-  } catch (error) {
+  const { tokenId } = await resolveAssetTag(normalized).catch((error) => {
     const duration = Date.now() - startTime
 
     console.log("[v0:telemetry] Asset tag lookup failed", {
@@ -33,5 +22,15 @@ export default async function AssetTagPage({ params }: PageProps) {
     })
 
     redirect("/?error=not-found")
-  }
+  })
+
+  const duration = Date.now() - startTime
+
+  console.log("[v0:telemetry] Asset tag resolved successfully", {
+    assetTag: normalized,
+    tokenId,
+    duration: `${duration}ms`,
+  })
+
+  redirect(`/p/${tokenId}`)
 }
